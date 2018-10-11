@@ -17,6 +17,7 @@ GNU General Public License (<a href="http://www.gnu.org/copyleft/gpl.html">GPL</
 #include "../pred/VMMPredictor.hpp"
 #include "decomp/DecompositionTreeBuilder.hpp"
 #include "../util/DefaultContext.hpp"
+#include "../util/IntSampleIter.hpp"
 #include "../util/StringSampleIter.hpp"
 
 #include <cmath>
@@ -52,84 +53,29 @@ namespace vmm_algs_decomp {
 
         int abSize;
         int vmmOrder;
+        
+        Context* trainingContext;
 
     public:
-        DCTWPredictor() : dctw(NULL) {  }
+        DCTWPredictor();
         
-        ~DCTWPredictor() {
-            if (dctw)
-                delete dctw;
-        }
+        ~DCTWPredictor();
         
-        void init(int _abSize, int _vmmOrder) {
-            abSize = _abSize;
-            vmmOrder = _vmmOrder;
-        }
+        /** init
+         * @param _abSize alphabet size.
+         * @param _vmmOrder the maximum order for the model.
+         */
+        void init(int _abSize, int _vmmOrder);
 
-        void learn(string trainingSequence) {
-            DecompositionTreeBuilder builder(abSize, vmmOrder);
+        void learn(string trainingSequence);
+        void learn(int* trainingSequence, int seqLength);
 
-            StringSampleIter ssi(trainingSequence);
-            dctw = builder.buildStatic((SampleIterator*)(&ssi));
+        double predict(int symbol, string context);
+        double predict(int symbol, int* context, int contextLength);
 
-            Context* context = new DefaultContext(vmmOrder);
+        double logEval(string testSequence);
 
-            for (int i=0, symbol=-1; i<trainingSequence.size(); ++i) {
-                symbol = (int)trainingSequence[i];
-                dctw->train(symbol, context);   // is dctw holding on to the context?
-                context->add(symbol);
-            }
-        }
-
-        double predict(int symbol, string context) {
-            try {
-              Context* ctwContext = new DefaultContext(vmmOrder);
-              for (int i = 0; i < context.length(); ++i) {
-                ctwContext->add( (int) context[i]);
-              }
-
-              return dctw->predict(symbol, ctwContext); // does dctw keep ctwContext or do we need to free it?
-            }
-            catch (exception ex) { //} (NullPointerException npe) {
-              if (dctw == NULL) {
-                  throw "VMMNotTrainedException"; // new VMMNotTrainedException();
-              }
-              else {
-                  throw ex; // npe;
-              }
-            }
-
-        }
-
-        double logEval(string testSequence) {
-            return logEval(testSequence, "");
-        }
-
-        double logEval(string testSequence, string initialContext) {
-            try {
-              Context* context = new DefaultContext(vmmOrder);
-              for (int i = 0; i < initialContext.size(); ++i) {
-                context->add( (int) initialContext[i]);
-              }
-
-              double eval = 0.0;
-              for (int i = 0, sym = 0; i < testSequence.size(); ++i) {
-                sym = (int) testSequence[i];
-                eval += log(dctw->predict(sym, context));
-                context->add(sym);
-              }
-
-              return eval * NEGTIVE_INVERSE_LOG_2;
-            }
-            catch (exception ex) { //} (NullPointerException npe) {
-                if (dctw == NULL) {
-                    throw "VMMNotTrainedException"; // new VMMNotTrainedException();
-                }
-                else {
-                    throw ex; // npe;
-                }
-            }
-        }
+        double logEval(string testSequence, string initialContext);
 
     };
 }

@@ -17,6 +17,13 @@
 		434DA3E720C4718A00FEB869 /* DCTWPredictor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 434DA3E620C4718A00FEB869 /* DCTWPredictor.cpp */; };
 		436DC33A20C9CB1300309429 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 436DC33920C9CB1300309429 /* main.cpp */; };
 		436DC33B20C9CC0100309429 /* DCTWPredictor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 434DA3E620C4718A00FEB869 /* DCTWPredictor.cpp */; };
+		43BED6872163B6A800F03ACF /* PPMCPredictor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 43BED6852163B6A800F03ACF /* PPMCPredictor.cpp */; };
+		43BED68921667B2300F03ACF /* OfflinePPMModel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 43BED68821667B2300F03ACF /* OfflinePPMModel.cpp */; };
+		43BED68B21667C3400F03ACF /* ArithCodeModel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 43BED68A21667C3400F03ACF /* ArithCodeModel.cpp */; };
+		43BED68D216D4A7900F03ACF /* OnlinePPMModel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 43BED68C216D4A7800F03ACF /* OnlinePPMModel.cpp */; };
+		43BED68F216E431B00F03ACF /* DecompositionTreeBuilder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 43BED68E216E431B00F03ACF /* DecompositionTreeBuilder.cpp */; };
+		43BED691216E53E900F03ACF /* PPMNode.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 43BED690216E53E900F03ACF /* PPMNode.cpp */; };
+		43BED693216E614100F03ACF /* PPMModel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 43BED692216E614100F03ACF /* PPMModel.cpp */; };
 		43EFF5BE20C06EE700D563B5 /* ml_vomm.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 43EFF5BC20C06EE700D563B5 /* ml_vomm.cpp */; };
 		43EFF5BF20C06EE700D563B5 /* ml_vomm.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 43EFF5BD20C06EE700D563B5 /* ml_vomm.hpp */; };
 		43EFF5CF20C0C0A200D563B5 /* DefaultPSTNode.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 43EFF5CE20C0C0A200D563B5 /* DefaultPSTNode.cpp */; };
@@ -45,9 +52,16 @@
 		434DA3E620C4718A00FEB869 /* DCTWPredictor.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = DCTWPredictor.cpp; path = src/DCTWPredictor.cpp; sourceTree = "<group>"; };
 		436DC31C20C9CA6200309429 /* VOMMtest */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = VOMMtest; sourceTree = BUILT_PRODUCTS_DIR; };
 		436DC33920C9CB1300309429 /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = main.cpp; path = VOMMtest/main.cpp; sourceTree = "<group>"; };
+		43BED6852163B6A800F03ACF /* PPMCPredictor.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = PPMCPredictor.cpp; path = src/PPMCPredictor.cpp; sourceTree = SOURCE_ROOT; };
+		43BED68821667B2300F03ACF /* OfflinePPMModel.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = OfflinePPMModel.cpp; path = include/algs/oppm/OfflinePPMModel.cpp; sourceTree = "<group>"; };
+		43BED68A21667C3400F03ACF /* ArithCodeModel.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ArithCodeModel.cpp; path = include/algs/com/colloquial/arithcode/ArithCodeModel.cpp; sourceTree = "<group>"; };
+		43BED68C216D4A7800F03ACF /* OnlinePPMModel.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = OnlinePPMModel.cpp; path = include/algs/oppm/OnlinePPMModel.cpp; sourceTree = "<group>"; };
+		43BED68E216E431B00F03ACF /* DecompositionTreeBuilder.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = DecompositionTreeBuilder.cpp; path = include/algs/decomp/DecompositionTreeBuilder.cpp; sourceTree = "<group>"; };
+		43BED690216E53E900F03ACF /* PPMNode.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = PPMNode.cpp; path = include/algs/com/colloquial/arithcode/PPMNode.cpp; sourceTree = "<group>"; };
+		43BED692216E614100F03ACF /* PPMModel.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = PPMModel.cpp; path = include/algs/com/colloquial/arithcode/PPMModel.cpp; sourceTree = "<group>"; };
 		43EFF5BC20C06EE700D563B5 /* ml_vomm.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ml_vomm.cpp; sourceTree = "<group>"; };
 		43EFF5BD20C06EE700D563B5 /* ml_vomm.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = ml_vomm.hpp; sourceTree = "<group>"; };
-		43EFF5CE20C0C0A200D563B5 /* DefaultPSTNode.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = DefaultPSTNode.cpp; sourceTree = "<group>"; };
+		43EFF5CE20C0C0A200D563B5 /* DefaultPSTNode.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = DefaultPSTNode.cpp; path = src/DefaultPSTNode.cpp; sourceTree = "<group>"; };
 		43EFF5D020C1B1C200D563B5 /* PSTBuilder.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = PSTBuilder.cpp; path = include/algs/pst/PSTBuilder.cpp; sourceTree = "<group>"; };
 		43FDB9431CE63D3C00343BBA /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		9093D87F1CF63EF800B43EC7 /* maxmspsdk.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = maxmspsdk.xcconfig; sourceTree = SOURCE_ROOT; };
@@ -94,6 +108,13 @@
 				434DA3E220C1C6CC00FEB869 /* PSTPredictor.cpp */,
 				434DA3E420C46C2700FEB869 /* BinaryCTWPredictor.cpp */,
 				434DA3E620C4718A00FEB869 /* DCTWPredictor.cpp */,
+				43BED68E216E431B00F03ACF /* DecompositionTreeBuilder.cpp */,
+				43BED6852163B6A800F03ACF /* PPMCPredictor.cpp */,
+				43BED68821667B2300F03ACF /* OfflinePPMModel.cpp */,
+				43BED68C216D4A7800F03ACF /* OnlinePPMModel.cpp */,
+				43BED692216E614100F03ACF /* PPMModel.cpp */,
+				43BED690216E53E900F03ACF /* PPMNode.cpp */,
+				43BED68A21667C3400F03ACF /* ArithCodeModel.cpp */,
 			);
 			name = Source;
 			sourceTree = "<group>";
@@ -237,12 +258,19 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				43BED693216E614100F03ACF /* PPMModel.cpp in Sources */,
 				436DC33B20C9CC0100309429 /* DCTWPredictor.cpp in Sources */,
 				43126F9420CAF93F00C550B5 /* PSTBuilder.cpp in Sources */,
 				436DC33A20C9CB1300309429 /* main.cpp in Sources */,
 				43126F9320CAF93C00C550B5 /* PSTPredictor.cpp in Sources */,
+				43BED68B21667C3400F03ACF /* ArithCodeModel.cpp in Sources */,
 				43126F9620CAF94700C550B5 /* BinaryCTWPredictor.cpp in Sources */,
+				43BED68921667B2300F03ACF /* OfflinePPMModel.cpp in Sources */,
 				43126F9520CAF94300C550B5 /* DefaultPSTNode.cpp in Sources */,
+				43BED68D216D4A7900F03ACF /* OnlinePPMModel.cpp in Sources */,
+				43BED68F216E431B00F03ACF /* DecompositionTreeBuilder.cpp in Sources */,
+				43BED6872163B6A800F03ACF /* PPMCPredictor.cpp in Sources */,
+				43BED691216E53E900F03ACF /* PPMNode.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

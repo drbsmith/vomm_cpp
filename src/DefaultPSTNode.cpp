@@ -1,4 +1,4 @@
-#include "include/algs/pst/DefaultPSTNode.hpp"
+#include "../include/algs/pst/DefaultPSTNode.hpp"
 
 #include <sstream>
 
