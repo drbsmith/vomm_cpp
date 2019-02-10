@@ -1,4 +1,4 @@
-#include "OfflinePPMModel.hpp"
+#include "../include/algs/oppm/OfflinePPMModel.hpp"
 
 using namespace vmm_algs_oppm;
 using namespace vmm_algs_com_colloquial_arithcode;

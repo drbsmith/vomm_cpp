@@ -31,22 +31,22 @@ void PPMCPredictor::init(int abSize, int vmmOrder) {
     ppmc = new OnlinePPMModel(vmmOrder, abSize);
 }
 
-void PPMCPredictor::learn(string trainingSequence) {
-    for (int symIndex = 0; symIndex < trainingSequence.length(); ++symIndex) {
-        ppmc->use(trainingSequence[symIndex]);
-    }
-}
-void PPMCPredictor::learn(int* trainingSequence, int seqLength) {
-    for (int index = 0; index < seqLength; ++index) {
-        ppmc->use(trainingSequence[index]);
+//void PPMCPredictor::learn(string trainingSequence) {
+//    for (int symIndex = 0; symIndex < trainingSequence.length(); ++symIndex) {
+//        ppmc->use(trainingSequence[symIndex]);
+//    }
+//}
+void PPMCPredictor::learn(vector<int>* trainingSequence) {
+    for (int index = 0; index < trainingSequence->size(); ++index) {
+        ppmc->use(trainingSequence->at(index));
     }
 }
 
-double PPMCPredictor::predict(int symbol, string context) {
+double PPMCPredictor::predict(int symbol, vector<int>* context) {
     try {
-        ppmc->clearContext();
-        for (int i = 0; i < context.length(); ++i) {
-            ppmc->predict( (int) context[i]); //updates the ppmc context
+        ppmc->clearContext(true);
+        for (int i = 0; i < context->size(); ++i) {
+            ppmc->predict( (int) context->at(i)); //updates the ppmc context
         }
         return ppmc->predict(symbol);
     }
@@ -60,14 +60,28 @@ double PPMCPredictor::predict(int symbol, string context) {
     }
 }
 
-double PPMCPredictor::logEval(string testSequence) {
+double* PPMCPredictor::predictAll(vector<int>* context) {
+    int abSize = ppmc->GetAlphaSize();
+    double* out = new double[abSize];
+    
+    ppmc->clearContext(true);
+    for (int j = 0; j < abSize; j++) {
+        for (int i = 0; i < context->size(); ++i) {
+            ppmc->predict(context->at(i)); //updates the ppmc context
+        }
+        out[j] = ppmc->predict(j);
+    }
+    return out;
+}
+
+double PPMCPredictor::logEval(vector<int>* testSequence) {
     try {
-        ppmc->clearContext();
+        ppmc->clearContext(true);
         
         double value = 0.0;
         
-        for (int i = 0; i < testSequence.length(); ++i) {
-            value += log(ppmc->predict( (int) testSequence[i]));
+        for (int i = 0; i < testSequence->size(); ++i) {
+            value += log(ppmc->predict(testSequence->at(i)));
         }
         return value * NEGTIVE_INVERSE_LOG_2; // the Math.log is in natural base
     }
@@ -79,12 +93,11 @@ double PPMCPredictor::logEval(string testSequence) {
             throw "NullPointerException";
         }
     }
-    
 }
 
-double PPMCPredictor::logEval(string testSequence, string initialContext) {
-    for (int symIndex = 0; symIndex < initialContext.length(); ++symIndex) {
-        ppmc->use(initialContext[(int) symIndex]);
+double PPMCPredictor::logEval(vector<int>* testSequence, vector<int>* initialContext) {
+    for (int symIndex = 0; symIndex < initialContext->size(); ++symIndex) {
+        ppmc->use(initialContext->at(symIndex));
     }
     return logEval(testSequence);
 }

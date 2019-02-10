@@ -45,6 +45,12 @@ namespace vmm_util {
             dataInd = 0;
             name = NULL_NAME;
         }
+        IntSampleIter(vector<int>* _data) {
+            data.insert(data.begin(), _data->begin(), _data->end());
+            
+            dataInd = 0;
+            name = NULL_NAME;
+        }
 
         bool hasNext() {
             return dataInd < data.size();

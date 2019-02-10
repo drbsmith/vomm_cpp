@@ -39,9 +39,9 @@ private:
   Context* context;
 
 public:
-  PSTArithPredictor(PSTNodeInterface* pstRoot) {
-    pst = pstRoot;
-    context = new DefaultContext(pst->subTreeHeight());
+    PSTArithPredictor(PSTNodeInterface* pstRoot) : pst(pstRoot), context(NULL) {
+      if (pst != NULL)
+          context = new DefaultContext(pst->subTreeHeight());
   }
 
     ~PSTArithPredictor() {
@@ -52,6 +52,9 @@ public:
    * @see arith.ArithPredictor
    */
   void predict(vector<double>* prediction){
+      if (pst == NULL || context == NULL)
+          return;
+      
     PSTNodeInterface* contextNode = pst->get(context->getIterator());
       
     contextNode->predict(prediction);   // fills prediction with the probabilities from contextNode
@@ -61,14 +64,18 @@ public:
    * @see arith.ArithPredictor
    */
   void increment(int symbol){
-    context->add(symbol);
+      if (context != NULL)
+          context->add(symbol);
   }
 
   /**
    * @see arith.ArithPredictor
    */
   int alphabetSize(){
-    return pst->getAlphabetSize();
+      if (pst != NULL)
+          return pst->getAlphabetSize();
+      else
+          return -1;
   }
 
 };

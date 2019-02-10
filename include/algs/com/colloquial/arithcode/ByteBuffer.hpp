@@ -72,13 +72,18 @@ public:
 //        _symbols = NULL;
     }
     
+    /** Set a new max width and clear everything
+     *
+     */
     void SetMaxWidth(int maxWidth) {
 //        if (_symbols)
 //            delete [] _symbols;
         
         _maxWidth = maxWidth;
         _symSize = BUFFER_SIZE_MULTIPLIER * maxWidth;
-        //_symbols = new int[_symSize];
+        _symbols.clear();
+        _length = 0;
+        _offset = 0;
     }
 
     /** Current array of bytes backing this byte buffer.  The returned

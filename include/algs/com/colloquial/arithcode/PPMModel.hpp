@@ -96,6 +96,7 @@ public:
     
     ~PPMModel();
 
+    int GetAlphaSize();
 
     // specified in ArithCodeModel
     bool escaped(int symbol);

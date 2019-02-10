@@ -1,5 +1,5 @@
 
-#include "DecompositionTreeBuilder.hpp"
+#include "../include/algs/decomp/DecompositionTreeBuilder.hpp"
 
 using namespace vmm_algs_decomp;
 

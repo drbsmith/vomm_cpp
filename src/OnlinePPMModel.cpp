@@ -1,4 +1,4 @@
-#include "OnlinePPMModel.hpp"
+#include "../include/algs/oppm/OnlinePPMModel.hpp"
 
 using namespace vmm_algs_oppm;
 using namespace vmm_algs_com_colloquial_arithcode;
@@ -24,8 +24,9 @@ double OnlinePPMModel::predict(int symbol) {
     
     if (isFirstPrediction) {
         isFirstPrediction = false;
-        _buffer->SetMaxWidth(_maxContextLength + 1);
-        _contextLength = 0;
+        clearContext(true);
+//        _buffer->SetMaxWidth(_maxContextLength + 1);
+//        _contextLength = 0;
         _contextNode = NULL;
     }
 
@@ -69,9 +70,15 @@ void OnlinePPMModel::interval(int symbol, int* result) {
 * Clears this OfflinePPMModel's context.
 * As a result the nexts symbol context will be the empty context.
 */
-void OnlinePPMModel::clearContext() {
+void OnlinePPMModel::clearContext(bool predict) {
+    if (predict)
+        _buffer = predictionBuffer;
+    else
+        _buffer = learningBuffer;
+    
     _buffer->SetMaxWidth(_maxContextLength+1);//new context buffer
     _contextLength = 0;//empty context length
+    _contextNode = NULL;
 }
 
 /** Returns interval for byte specified as an integer in 0 to 255 range.

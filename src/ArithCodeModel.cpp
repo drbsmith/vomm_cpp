@@ -1,4 +1,4 @@
-#include "ArithCodeModel.hpp"
+#include "../include/algs/com/colloquial/arithcode/ArithCodeModel.hpp"
 
 using namespace vmm_algs_com_colloquial_arithcode;
 

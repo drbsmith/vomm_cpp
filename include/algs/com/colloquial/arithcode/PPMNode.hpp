@@ -115,7 +115,6 @@ public:
 
     /** Returns <code>true</code> if the number of children for
      * this node is <code>1</code>.
-     * @param excludedBytes Bytes that have been seen in escaped context that should not be considered children.
      * @return <code>true</code> if the scaled number of outcomes for this node is <code>1</code>.
      */
     bool isDeterministic();

@@ -15,6 +15,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License (<a href="http://www.gnu.org/copyleft/gpl.html">GPL</a>) for more details.*/
 
 #include <string>
+#include <vector>
 
 namespace vmm_pred {
 
@@ -29,12 +30,19 @@ namespace vmm_pred {
 
 class VMMPredictor {
 public:
-    virtual ~VMMPredictor() {}
+    ~VMMPredictor() {}
   /**
    * This VMMPredictor use trainingSequence and consturcts its model.
    * @param trainingSequence a sequence
    */
-    virtual void learn(std::string trainingSequence)=0;
+    virtual void learn(std::string trainingSequence) {
+        std::vector<int> seq;
+        for (int i = 0; i < trainingSequence.size(); i++) {
+            seq.push_back((int)trainingSequence.at(i));
+        }
+        learn(&seq);
+    }
+    virtual void learn(std::vector<int>* trainingSequence)=0;
 
   /**
    * Predicts the next symbol according to some context.
@@ -44,7 +52,14 @@ public:
    * @return the likelihood prediction
    * @throws VMMNotTrainedException when predicting without training
    */
-    virtual double predict(int symbol, std::string context)=0;
+    double predict(int symbol, std::string context) {
+        std::vector<int> seq;
+        for (int i = 0; i < context.size(); i++) {
+            seq.push_back((int)context.at(i));
+        }
+        return predict(symbol, &seq);
+    }
+    virtual double predict(int symbol, std::vector<int>* context)=0;
 
   /**
    * Predicts the log-likelihood of the testSequence, according
@@ -55,7 +70,14 @@ public:
    * @return the -log( Probability (testSequence | trainingSequence) )
    * @throws VMMNotTrainedException when predicting without training
    */
-    virtual double logEval(std::string testSequence)=0;
+    double logEval(std::string testSequence) {
+        std::vector<int> seq;
+        for (int i = 0; i < testSequence.size(); i++) {
+            seq.push_back((int)testSequence.at(i));
+        }
+        return logEval(&seq);
+    }
+    virtual double logEval(std::vector<int>* testSequence)=0;
 
   /**
    * Predicts the log-likelihood of the testSequence, according
@@ -67,7 +89,30 @@ public:
    * @return double logEval
    * @throws VMMNotTrainedException when predicting without training
    */
-    virtual double logEval(std::string testSequence, std::string initialContext)=0;
+    double logEval(std::string testSequence, std::string initialContext) {
+        
+        std::vector<int> tseq, icon;
+        for (int i = 0; i < testSequence.size(); i++) {
+            tseq.push_back((int)testSequence.at(i));
+        }
+        for (int i = 0; i < initialContext.size(); i++) {
+            icon.push_back((int)initialContext.at(i));
+        }
+        return logEval(&tseq, &icon);
+    }
+    virtual double logEval(std::vector<int>* testSequence, std::vector<int>* initialContext)=0;
+
+    double* predictAll(std::string context) {
+        std::vector<int> seq;
+        for (int i = 0; i < context.size(); i++) {
+            seq.push_back((int)context.at(i));
+        }
+        return predictAll(&seq);
+    };
+    virtual double* predictAll(std::vector<int>* context) =0;
+    
+    virtual std::string ModelToString() =0;
+    virtual void ModelFromString(std::string data) =0;
 };
     
 } // namespace vmm_pred

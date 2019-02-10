@@ -66,17 +66,25 @@ namespace vmm_algs_decomp {
          * @param _vmmOrder the maximum order for the model.
          */
         void init(int _abSize, int _vmmOrder);
+        
+        void learn(vector<int>* trainingSequence);
+        
+        double predict(int symbol, vector<int>* context);
+        
+        double logEval(vector<int>* testSequence);
+        
+        double logEval(vector<int>* testSequence, vector<int>* initialContext);
 
-        void learn(string trainingSequence);
-        void learn(int* trainingSequence, int seqLength);
-
-        double predict(int symbol, string context);
-        double predict(int symbol, int* context, int contextLength);
-
-        double logEval(string testSequence);
-
-        double logEval(string testSequence, string initialContext);
-
+        double* predictAll(vector<int>* context);
+        
+        string ModelToString() { return ""; };
+        void ModelFromString(string data) { };
+        
+        void learn(string s) { VMMPredictor::learn(s); }
+        double predict(int symbol, string context) { return VMMPredictor::predict(symbol, context); }
+        double logEval(string s) { return VMMPredictor::logEval(s); }
+        double logEval(string t, string c) { return VMMPredictor::logEval(t, c); }
+        double* predictAll(string context) { return VMMPredictor::predictAll(context); }
     };
 }
     

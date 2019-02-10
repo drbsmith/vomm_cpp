@@ -6,7 +6,7 @@
 //
 
 #include <stdio.h>
-#include "PSTBuilder.hpp"
+#include "../include/algs/pst/PSTBuilder.hpp"
 
 using namespace vmm_algs_pst;
 

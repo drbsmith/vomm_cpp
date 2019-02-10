@@ -14,11 +14,7 @@
  GNU General Public License (<a href="http://www.gnu.org/copyleft/gpl.html">GPL</a>) for more details.*/
 
 #include "../pred/VMMPredictor.hpp"
-#include "pst/PSTArithPredictor.hpp"
 #include "pst/PSTNodeInterface.hpp"
-#include "pst/PSTBuilder.hpp"
-#include "../util/SampleIterator2SamplesBridge.hpp"
-#include "../util/StringSampleIter.hpp"
 
 #include "math.h"
 using namespace vmm_util;
@@ -72,13 +68,24 @@ namespace vmm_algs_pst {
         */
         void init(int _abSize, double _pMin, double _alpha, double _gamma, double _r, int _vmmOrder);
 
-        void learn(string trainingSequence);
+        void learn(vector<int>* trainingSequence);
 
-        double predict(int symbol, string context);
+        double predict(int symbol, vector<int>* context);
 
-        double logEval(string testSequence);
+        double logEval(vector<int>* testSequence);
 
-        double logEval(string testSequence, string initialContext);
+        double logEval(vector<int>* testSequence, vector<int>* initialContext);
+        
+        double* predictAll(vector<int>* context);
+        
+        string ModelToString() { return ""; };
+        void ModelFromString(string data) { };
+        
+        void learn(string s) { VMMPredictor::learn(s); }
+        double predict(int symbol, string context) { return VMMPredictor::predict(symbol, context); }
+        double logEval(string s) { return VMMPredictor::logEval(s); }
+        double logEval(string t, string c) { return VMMPredictor::logEval(t, c); }
+        double* predictAll(string context) { return VMMPredictor::predictAll(context); }
     };
 }
 #endif // _VMMPREDICTOR_HPP

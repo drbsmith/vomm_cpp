@@ -1,5 +1,5 @@
-#include "PPMNode.hpp"
-#include "ArithCodeModel.hpp"
+#include "../include/algs/com/colloquial/arithcode/PPMNode.hpp"
+#include "../include/algs/com/colloquial/arithcode/ArithCodeModel.hpp"
 
 #include <sstream>
 #include <vector>

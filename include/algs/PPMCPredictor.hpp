@@ -69,21 +69,28 @@ namespace vmm_algs_ppmc {
         
         void init(int abSize, int vmmOrder);
         
-        void learn(string trainingSequence);
         /** Learn: use an array of integers to train the model
          * @param trainingSequence the array of integers to use for training
          * @param seqLength the length of the array in integers
          */
-        void learn(int* trainingSequence, int seqLength);
+        void learn(vector<int>* trainingSequence);
         
-        double predict(int symbol, string context);
+        double predict(int symbol, vector<int>* context);
         
-        double logEval(string testSequence);
+        double logEval(vector<int>* testSequence);
         
-        double logEval(string testSequence, string initialContext);
+        double logEval(vector<int>* testSequence, vector<int>* initialContext);
+        
+        double* predictAll(vector<int>* context);
         
         string ModelToString();
         void ModelFromString(string data);
+        
+        void learn(string s) { VMMPredictor::learn(s); }
+        double predict(int symbol, string context) { return VMMPredictor::predict(symbol, context); }
+        double logEval(string s) { return VMMPredictor::logEval(s); }
+        double logEval(string t, string c) { return VMMPredictor::logEval(t, c); }
+        double* predictAll(string context) { return VMMPredictor::predictAll(context); }
     };  // class
 } // namespace
 

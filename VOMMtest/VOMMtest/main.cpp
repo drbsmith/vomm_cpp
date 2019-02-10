@@ -12,22 +12,27 @@
 #include "../../include/algs/BinaryCTWPredictor.hpp"
 #include "../../include/algs/DCTWPredictor.hpp"
 #include "../../include/algs/PPMCPredictor.hpp"
+#include "../../include/algs/LZmsPredictor.hpp"
 
 using namespace vmm_algs_ctw;
 using namespace vmm_algs_pst;
 using namespace vmm_algs_decomp;
 using namespace vmm_algs_ppmc;
+using namespace vmm_algs_lzms;
 using namespace std;
 
 int main(int argc, const char * argv[]) {
     
     int data[] = {97, 98, 114, 97, 99, 97, 100, 97, 98, 114, 97}; // same as seq = "abracadabra"
+    vector<int> dataVec;
+    for (int i = 0; i < 11; i++)
+        dataVec.push_back(data[i]);
     
     cout << "PST: " << endl;
     PSTPredictor pst;
     
     pst.init(256, 0.001, 0.0, 0.0001, 1.05, 20);
-    pst.learn("abracadabra");
+//    pst.learn("abracadabra");
     
     cout << "logeval : " << pst.logEval("cadabra") << endl;
     cout << "P(c|abra) : " << pst.predict('c', "abra") << endl << endl;
@@ -38,7 +43,7 @@ int main(int argc, const char * argv[]) {
 //     char data[] = {97, 98, 114, 97, 99, 97, 100, 97, 98, 114, 97}; // same as seq = "abracadabra"
 //     string seq(data);
     
-     ctw.learn("abracadabra");
+    ctw.learn("abracadabra");
     
     cout << "logeval : " << ctw.logEval("cadabra") << endl;
     cout << "P(c|abra) : " << ctw.predict('c', "abra") << endl << endl;
@@ -46,7 +51,7 @@ int main(int argc, const char * argv[]) {
     
     DCTWPredictor dctw;
     dctw.init(256, 5);
-    dctw.learn(&data[0], 11); //"abracadabra");
+    dctw.learn(&dataVec); //"abracadabra");
     
     cout << "DCTW:" << endl;
     cout << "logeval : " << dctw.logEval("cadabra") << endl;
@@ -63,10 +68,16 @@ int main(int argc, const char * argv[]) {
 //    for (int i = 0; i < 4; i++) {
 //        ppmc.learn("abracadabra");
 //    }
-    ppmc.learn(&data[0], 11);
+//    for (int i = 0; i < 11; i++) {
+//        int j = data[i];
+//        ppmc.learn(&j, 1);
+//    }
+    ppmc.learn(&dataVec);
     
     cout << "PPMC:" << endl;
     cout << "logeval : " << ppmc.logEval("cadabra") << endl;
+//    cout << "logeval : " << ppmc.logEval("cadabra") << endl;
+//    cout << "logeval : " << ppmc.logEval("cadabra") << endl;
     cout << "P(c|abra) : " << ppmc.predict('c', "abra") << endl;
     cout << "P(c|dab) : " << ppmc.predict('c', "dab") << endl;
     cout << "P(c|ra) : " << ppmc.predict('c', "ra") << endl;
@@ -76,6 +87,11 @@ int main(int argc, const char * argv[]) {
 //    for (int i = 0; i < 256; i++) {
 //        cout << ppmc.predict(i, "abra") << ", ";
 //    }
+//    double* pred = ppmc.predictAll("abra");
+//    for (int i = 0; i < 256; i++) {
+//        cout << pred[i] << ", ";
+//    }
+//    delete [] pred;
     
     string model = ppmc.ModelToString();    // get the model encoded as an ascii string
     
@@ -98,5 +114,20 @@ int main(int argc, const char * argv[]) {
     cout << "P(d|ra) : " << ppmc.predict('d', "ra") << endl << endl;
     
     cout << ppmc.ModelToString();
+    
+    cout << "LZms: " << endl;
+    LZmsPredictor lzms;
+    
+    lzms.init(256, 2, 0);
+    lzms.learn("abracadabra");
+    
+    cout << "logeval : " << lzms.logEval("cadabra") << endl;
+    cout << "P(c|abra) : " << lzms.predict('c', "abra") << endl;
+    cout << "P(c|dab) : " << lzms.predict('c', "dab") << endl;
+    cout << "P(c|ra) : " << lzms.predict('c', "ra") << endl;
+    cout << "P(c|bra) : " << lzms.predict('c', "bra") << endl;
+    cout << "P(c|abcd) : " << lzms.predict('c', "abcd") << endl;
+    cout << "P(d|ra) : " << lzms.predict('d', "ra") << endl << endl;
+    
     return 0;
 }

@@ -48,8 +48,9 @@ namespace vmm_algs_oppm {
   /**
    * Clears this OfflinePPMModel's context.
    * As a result the nexts symbol context will be the empty context.
+   * @param predict switches between learningBuffer (false) and predictionBuffer (true)
    */
-        void clearContext();
+        void clearContext(bool predict = false);
 
   /** Returns interval for byte specified as an integer in 0 to 255 range.
    * @param i Integer specification of byte in 0 to 255 range.

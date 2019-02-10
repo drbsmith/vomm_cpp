@@ -1,4 +1,4 @@
-#include "PPMModel.hpp"
+#include "../include/algs/com/colloquial/arithcode/PPMModel.hpp"
 
 using namespace vmm_algs_com_colloquial_arithcode;
 
@@ -42,6 +42,9 @@ PPMModel::~PPMModel() {
     delete _buffer;
 }
 
+int PPMModel::GetAlphaSize() {
+    return abSize;
+}
 
 // specified in ArithCodeModel
 bool PPMModel::escaped(int symbol) {
