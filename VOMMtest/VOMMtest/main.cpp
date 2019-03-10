@@ -6,7 +6,18 @@
 //  Copyright © 2018 Benjamin Smith. All rights reserved.
 //
 
+// defines to test each of the vomm algorithms
+//#define TEST_PST
+//#define TEST_BIN
+//#define TEST_DCTW
+//#define TEST_PPMC
+#define TEST_LZMS
+
+#define ALPHA_SIZE 256
+//#define TRAINING_SIZE 100
+
 #include <iostream>
+#include <vector>
 
 #include "../../include/algs/PSTPredictor.hpp"
 #include "../../include/algs/BinaryCTWPredictor.hpp"
@@ -14,6 +25,7 @@
 #include "../../include/algs/PPMCPredictor.hpp"
 #include "../../include/algs/LZmsPredictor.hpp"
 
+// using namespaces for each of the different algorithms
 using namespace vmm_algs_ctw;
 using namespace vmm_algs_pst;
 using namespace vmm_algs_decomp;
@@ -22,38 +34,58 @@ using namespace vmm_algs_lzms;
 using namespace std;
 
 int main(int argc, const char * argv[]) {
-    
-    int data[] = {97, 98, 114, 97, 99, 97, 100, 97, 98, 114, 97}; // same as seq = "abracadabra"
     vector<int> dataVec;
-    for (int i = 0; i < 11; i++)
-        dataVec.push_back(data[i]);
+#ifdef TRAINING_SIZE
+    for (int i = 0; i < TRAINING_SIZE; i++)
+        dataVec.push_back(rand() % ALPHA_SIZE);
+#else
+    int data[] = {97, 98, 114, 97, 99, 97, 100, 97, 98, 114, 97}; // same as seq = "abracadabra"
+    string test = "The quick brown fox jumped over the lazy dog.";
+    for (int i = 0; i < test.size(); i++)
+        dataVec.push_back(test[i]);
+#endif
     
+#ifdef TEST_PST
     cout << "PST: " << endl;
     PSTPredictor pst;
     
-    pst.init(256, 0.001, 0.0, 0.0001, 1.05, 20);
-//    pst.learn("abracadabra");
+    pst.init(ALPHA_SIZE, 0.001, 0.0, 0.0001, 1.05, 20);
+    pst.learn(&dataVec);
     
     cout << "logeval : " << pst.logEval("cadabra") << endl;
     cout << "P(c|abra) : " << pst.predict('c', "abra") << endl << endl;
-    
+#endif
+#ifdef TEST_BIN
     cout << "Binary CTW:" << endl;
     BinaryCTWPredictor ctw;
-    ctw.init(6, 8);
+    ctw.init(ALPHA_SIZE, 5);
 //     char data[] = {97, 98, 114, 97, 99, 97, 100, 97, 98, 114, 97}; // same as seq = "abracadabra"
 //     string seq(data);
     
-    ctw.learn("abracadabra");
+    ctw.learn(&dataVec);
     
     cout << "logeval : " << ctw.logEval("cadabra") << endl;
     cout << "P(c|abra) : " << ctw.predict('c', "abra") << endl << endl;
-
     
-    DCTWPredictor dctw;
-    dctw.init(256, 5);
-    dctw.learn(&dataVec); //"abracadabra");
-    
+//    double* prob;
+//    for (int i = 0; i < 100; i++) {
+//        prob = ctw.predictAll("abrac");
+//        cout << prob[0] << endl;
+//    }
+//    ctw.learn(&dataVec);
+//    for (int i = 0; i < 100; i++) {
+//        prob = ctw.predictAll("abrac");
+//        cout << prob[0] << endl;
+//    }
+#endif
+#ifdef TEST_DCTW
     cout << "DCTW:" << endl;
+    DCTWPredictor dctw;
+    
+    dctw.init(ALPHA_SIZE, 5);
+    dctw.learn(&dataVec); //"abracadabra");
+//    dctw.learn("the quick brown fox jumped over the lazy dog.");
+    
     cout << "logeval : " << dctw.logEval("cadabra") << endl;
     cout << "P(c|abra) : " << dctw.predict('c', "abra") << endl;
     
@@ -63,8 +95,16 @@ int main(int argc, const char * argv[]) {
     cout << "P(c|abcd) : " << dctw.predict('c', "abcd") << endl;
     cout << "P(d|ra) : " << dctw.predict('d', "ra") << endl << endl;
     
+//    cout << "P(z|the la) : " << dctw.predict('z', "the la") << endl;
+//    cout << "P(y|the la) : " << dctw.predict('y', "the la") << endl;
+//    cout << "P( |the la) : " << dctw.predict(' ', "the la") << endl;
+    
+//    cout << dctw.ModelToString() << endl; // this is not finished, for serializing and deserializing. It's a complex tree with lots of nodes!
+#endif
+#ifdef TEST_PPMC
+    cout << "PPMC:" << endl;
     PPMCPredictor ppmc;
-    ppmc.init(256, 5);
+    ppmc.init(ALPHA_SIZE, 5);
 //    for (int i = 0; i < 4; i++) {
 //        ppmc.learn("abracadabra");
 //    }
@@ -74,7 +114,6 @@ int main(int argc, const char * argv[]) {
 //    }
     ppmc.learn(&dataVec);
     
-    cout << "PPMC:" << endl;
     cout << "logeval : " << ppmc.logEval("cadabra") << endl;
 //    cout << "logeval : " << ppmc.logEval("cadabra") << endl;
 //    cout << "logeval : " << ppmc.logEval("cadabra") << endl;
@@ -95,7 +134,7 @@ int main(int argc, const char * argv[]) {
     
     string model = ppmc.ModelToString();    // get the model encoded as an ascii string
     
-    ppmc.init(256,5);
+    ppmc.init(ALPHA_SIZE,5);
     ppmc.ModelFromString(model);    // reconstitute the model from the ascii string!
     
     // Could also feed the model in 1 line at a time:
@@ -112,14 +151,15 @@ int main(int argc, const char * argv[]) {
     cout << "P(c|bra) : " << ppmc.predict('c', "bra") << endl;
     cout << "P(c|abcd) : " << ppmc.predict('c', "abcd") << endl;
     cout << "P(d|ra) : " << ppmc.predict('d', "ra") << endl << endl;
-    
-    cout << ppmc.ModelToString();
-    
+//
+//    cout << ppmc.ModelToString();
+#endif
+#ifdef TEST_LZMS
     cout << "LZms: " << endl;
     LZmsPredictor lzms;
     
-    lzms.init(256, 2, 0);
-    lzms.learn("abracadabra");
+    lzms.init(ALPHA_SIZE, 4, 0);    // LZMS takes the ALPHA_SIZE for initialization, but by difinition the dictionary will expand if new characters/tokens are encountered. It's not a hard limit, like with the others.
+    lzms.learn(&dataVec);
     
     cout << "logeval : " << lzms.logEval("cadabra") << endl;
     cout << "P(c|abra) : " << lzms.predict('c', "abra") << endl;
@@ -129,5 +169,11 @@ int main(int argc, const char * argv[]) {
     cout << "P(c|abcd) : " << lzms.predict('c', "abcd") << endl;
     cout << "P(d|ra) : " << lzms.predict('d', "ra") << endl << endl;
     
+//    double* pred = lzms.predictAll("abra");
+//    for (int i = 0; i < 256; i++) {
+//        cout << pred[i] << ", ";
+//    }
+//    delete [] pred;
+#endif
     return 0;
 }

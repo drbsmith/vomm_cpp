@@ -55,6 +55,9 @@ void PSTPredictor::learn(vector<int>* trainingSequence) {
 }
 
 double PSTPredictor::predict(int symbol, vector<int>* context) {
+    if (symbol >= abSize)
+        return -1;
+    
     try {
         vector<double> pArr(abSize); // = new double[abSize];
         
@@ -62,8 +65,10 @@ double PSTPredictor::predict(int symbol, vector<int>* context) {
         
         for (int i = 0, sym = -1; i < context->size(); ++i) {
             sym = (int) context->at(i);
-            pstPredictor.predict(&pArr);
-            pstPredictor.increment(sym);
+            if (sym < abSize) {
+                pstPredictor.predict(&pArr);
+                pstPredictor.increment(sym);
+            }
         }
         pstPredictor.predict(&pArr);
         return pArr.at(symbol);
@@ -102,15 +107,18 @@ double PSTPredictor::logEval(vector<int>* testSequence, vector<int>* initialCont
         if (initialContext != NULL) {
             for (int i = 0, sym = -1; i < initialContext->size(); ++i) {
                 sym = (int) initialContext->at(i);
-                pstPredictor.increment(sym);
+                if (sym < abSize)
+                    pstPredictor.increment(sym);
             }
         }
         
         for (int i = 0, sym = -1; i < testSequence->size(); ++i) {
             sym = (int) testSequence->at(i);
-            pstPredictor.predict(&pArr);
-            eval += log(pArr.at(sym));
-            pstPredictor.increment(sym);
+            if (sym < abSize) {
+                pstPredictor.predict(&pArr);
+                eval += log(pArr.at(sym));
+                pstPredictor.increment(sym);
+            }
         }
         
         return eval * NEGTIVE_INVERSE_LOG_2;

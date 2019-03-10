@@ -77,8 +77,8 @@ namespace vmm_algs_decomp {
 
         double* predictAll(vector<int>* context);
         
-        string ModelToString() { return ""; };
-        void ModelFromString(string data) { };
+        string ModelToString();
+        void ModelFromString(string data);
         
         void learn(string s) { VMMPredictor::learn(s); }
         double predict(int symbol, string context) { return VMMPredictor::predict(symbol, context); }

@@ -27,6 +27,8 @@
 		43BED68F216E431B00F03ACF /* DecompositionTreeBuilder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 43BED68E216E431B00F03ACF /* DecompositionTreeBuilder.cpp */; };
 		43BED691216E53E900F03ACF /* PPMNode.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 43BED690216E53E900F03ACF /* PPMNode.cpp */; };
 		43BED693216E614100F03ACF /* PPMModel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 43BED692216E614100F03ACF /* PPMModel.cpp */; };
+		43C5C7A5221A18F0000A150F /* AbsBinaryDNode.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 43C5C7A4221A18F0000A150F /* AbsBinaryDNode.cpp */; };
+		43C5C7A9221A365B000A150F /* DecompVolfNode.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 43C5C7A8221A365B000A150F /* DecompVolfNode.cpp */; };
 		43EFF5BE20C06EE700D563B5 /* ml_vomm.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 43EFF5BC20C06EE700D563B5 /* ml_vomm.cpp */; };
 		43EFF5BF20C06EE700D563B5 /* ml_vomm.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 43EFF5BD20C06EE700D563B5 /* ml_vomm.hpp */; };
 		43EFF5CF20C0C0A200D563B5 /* DefaultPSTNode.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 43EFF5CE20C0C0A200D563B5 /* DefaultPSTNode.cpp */; };
@@ -66,6 +68,8 @@
 		43BED68E216E431B00F03ACF /* DecompositionTreeBuilder.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = DecompositionTreeBuilder.cpp; path = src/DecompositionTreeBuilder.cpp; sourceTree = "<group>"; };
 		43BED690216E53E900F03ACF /* PPMNode.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = PPMNode.cpp; path = src/PPMNode.cpp; sourceTree = "<group>"; };
 		43BED692216E614100F03ACF /* PPMModel.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = PPMModel.cpp; path = src/PPMModel.cpp; sourceTree = "<group>"; };
+		43C5C7A4221A18F0000A150F /* AbsBinaryDNode.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = AbsBinaryDNode.cpp; path = src/AbsBinaryDNode.cpp; sourceTree = "<group>"; };
+		43C5C7A8221A365B000A150F /* DecompVolfNode.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = DecompVolfNode.cpp; path = src/DecompVolfNode.cpp; sourceTree = "<group>"; };
 		43EFF5BC20C06EE700D563B5 /* ml_vomm.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ml_vomm.cpp; sourceTree = "<group>"; };
 		43EFF5BD20C06EE700D563B5 /* ml_vomm.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = ml_vomm.hpp; sourceTree = "<group>"; };
 		43EFF5CE20C0C0A200D563B5 /* DefaultPSTNode.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = DefaultPSTNode.cpp; path = src/DefaultPSTNode.cpp; sourceTree = "<group>"; };
@@ -127,6 +131,8 @@
 				43BED690216E53E900F03ACF /* PPMNode.cpp */,
 				43EFF5D020C1B1C200D563B5 /* PSTBuilder.cpp */,
 				434DA3E220C1C6CC00FEB869 /* PSTPredictor.cpp */,
+				43C5C7A4221A18F0000A150F /* AbsBinaryDNode.cpp */,
+				43C5C7A8221A365B000A150F /* DecompVolfNode.cpp */,
 			);
 			name = Source;
 			sourceTree = "<group>";
@@ -274,6 +280,7 @@
 				436DC33B20C9CC0100309429 /* DCTWPredictor.cpp in Sources */,
 				43126F9420CAF93F00C550B5 /* PSTBuilder.cpp in Sources */,
 				436DC33A20C9CB1300309429 /* main.cpp in Sources */,
+				43C5C7A9221A365B000A150F /* DecompVolfNode.cpp in Sources */,
 				43126F9320CAF93C00C550B5 /* PSTPredictor.cpp in Sources */,
 				43BED68B21667C3400F03ACF /* ArithCodeModel.cpp in Sources */,
 				439FB3352199FA0F00BEF666 /* LZNodeHashStorage.cpp in Sources */,
@@ -282,6 +289,7 @@
 				43BED68921667B2300F03ACF /* OfflinePPMModel.cpp in Sources */,
 				43126F9520CAF94300C550B5 /* DefaultPSTNode.cpp in Sources */,
 				43BED68D216D4A7900F03ACF /* OnlinePPMModel.cpp in Sources */,
+				43C5C7A5221A18F0000A150F /* AbsBinaryDNode.cpp in Sources */,
 				43BED68F216E431B00F03ACF /* DecompositionTreeBuilder.cpp in Sources */,
 				43FA14762198B58A00FC8DEF /* LZmsTree.cpp in Sources */,
 				43BED6872163B6A800F03ACF /* PPMCPredictor.cpp in Sources */,

@@ -25,7 +25,7 @@
 
 #include "../pred/VMMPredictor.hpp"
 #include "oppm/OnlinePPMModel.hpp"
-#include "oppm/OPPMtestException.hpp"
+//#include "oppm/OPPMtestException.hpp"
 
 #include <string>
 //import vmm.pred.VMMNotTrainedException;

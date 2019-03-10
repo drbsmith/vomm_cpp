@@ -34,6 +34,8 @@ class LZNodeHashStorage : public LZNodeStorage {
     std::map< int, LZmsNode*> storage;
 
     public:
+    ~LZNodeHashStorage();
+    
         void put(int key, LZmsNode* node);
 
         vmm_algs_lzms::LZmsNode* get(int key);

@@ -37,9 +37,12 @@ PPMModel::~PPMModel() {
             delete _contexts.at(i);
     _contexts.clear();
     
-    delete _excludedBytes;
-    delete _backoffModel;
-    delete _buffer;
+    if (_excludedBytes)
+        delete _excludedBytes;
+    if (_backoffModel)
+        delete _backoffModel;
+    if (_buffer)
+        delete _buffer;
 }
 
 int PPMModel::GetAlphaSize() {

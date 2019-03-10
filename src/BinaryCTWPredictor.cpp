@@ -122,12 +122,24 @@ double BinaryCTWPredictor::logEval(vector<int>* testSequence, vector<int>* initi
 double* BinaryCTWPredictor::predictAll(vector<int>* context) {
     double* out = new double[abSize];
     
-    ctw->clearContext();
+//    ctw->clearContext();
+//    for (int i = 0, sym = -1; i < context->size(); ++i) {
+//        sym = (int) context->at(i);
+//        for (int bit = abSymSizeInBits - 1; bit >= 0; --bit) {
+//            ctw->predict( (sym & BIT_MASKS[bit]) >> bit); //update the ctw context
+//        }
+//    }
+    
     for (int j = 0; j < abSize; j++) {
-        for (int i = 0; i < context->size(); ++i) {
-            ctw->predict(context->at(i)); //updates the ppmc context
-        }
-        out[j] = ctw->predict(j);
+//        double p = 1.0;
+//        for (int bit = abSymSizeInBits - 1; bit >= 0; --bit) {
+//            p *= ctw->predict( (j & BIT_MASKS[bit]) >> bit);
+//        }
+        out[j] = predict(j, context);
+//        for (int i = 0; i < context->size(); ++i) {
+//            ctw->predict(context->at(i)); //updates the ppmc context
+//        }
+//        out[j] = ctw->predict(j);
     }
     return out;
 }

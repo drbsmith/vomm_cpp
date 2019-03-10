@@ -48,9 +48,11 @@ private:
 	   Constructs a LZmsTree
 	*/
 public:
-        LZmsTree(int _minContext, int _numShifts, int _alphabetSize);
+    LZmsTree(int _minContext, int _numShifts, int _alphabetSize);
 
-        void learnSequence(std::vector<int>* sequence);
+    ~LZmsTree();
+
+    void learnSequence(std::vector<int>* sequence);
 
 private:
     void learnOffsetSequence(std::vector<int>* sequence, int offset);

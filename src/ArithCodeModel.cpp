@@ -8,3 +8,5 @@ const int ArithCodeModel::_EOF = -1;
  * symbol has no interval in the current context.  Guaranteed to be negative.
  */
 const int ArithCodeModel::ESCAPE = -2;
+
+ArithCodeModel::~ArithCodeModel () {};

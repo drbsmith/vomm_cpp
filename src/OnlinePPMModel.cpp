@@ -16,10 +16,19 @@ OnlinePPMModel::OnlinePPMModel(int maxCodeLength, int absize) : PPMModel(maxCode
 }
 
 OnlinePPMModel::~OnlinePPMModel() {
-    
+    // one of our buffers (==_buffer) will be deleted by base destructor.
+    if (predictionBuffer && predictionBuffer != _buffer) {
+        delete predictionBuffer;
+    }
+    if (learningBuffer && learningBuffer != _buffer) {
+        delete learningBuffer;
+    }
 }
 
 double OnlinePPMModel::predict(int symbol) {
+    if (symbol >= abSize)
+        return -1;
+    
     _buffer = predictionBuffer;
     
     if (isFirstPrediction) {

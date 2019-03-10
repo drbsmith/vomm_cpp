@@ -23,10 +23,14 @@ void LZmsPredictor::init(int _abSize, int _mParam, int _sParam) {
     abSize = _abSize;
     mParam = _mParam;
     sParam = _sParam;
+    
+    if (lzms)
+        delete lzms;
+    
+    lzms = new LZmsTree(mParam, sParam, abSize);
 }
 
 void LZmsPredictor::learn(std::vector<int>* trainingSequence) {
-    lzms = new LZmsTree(mParam, sParam, abSize);
     lzms->learnSequence(trainingSequence);
 }
 
@@ -61,9 +65,10 @@ double* LZmsPredictor::predictAll(vector<int>* context) {
     seqWithSym.insert(seqWithSym.begin(), context->begin(), context->end());
     seqWithSym.push_back(0);    // init final slot
     
+    double logOfContext = logEval(context);
     for (int j = 0; j < abSize; j++) {
-        seqWithSym.at(context->size()); // replace last slot with token j
-        out[j] = pow( 2.0, - (logEval(&seqWithSym) - logEval(context)));
+        seqWithSym.at(context->size()) = j; // replace last slot with token j
+        out[j] = pow( 2.0, - (logEval(&seqWithSym) - logOfContext));
     }
     return out;
 }
@@ -74,7 +79,11 @@ double LZmsPredictor::logEval(vector<int>* testSequence) {
     //                for (int i = 0; i < testSequence.length(); ++i) {
     //                    symList.push_back( (int) testSequence[i]);
     //                }
-    return lzms->calcLogLikelihood(testSequence); //.toNativeArray());
+    if (lzms)
+        return lzms->calcLogLikelihood(testSequence); //.toNativeArray());
+    else
+        return -1;  // error, not trained!
+    
     //            }
     //            catch (std::exception npe) { //NullPointerException npe) {
     //              if (lzms == null) {

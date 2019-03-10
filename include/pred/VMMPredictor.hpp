@@ -30,7 +30,7 @@ namespace vmm_pred {
 
 class VMMPredictor {
 public:
-    ~VMMPredictor() {}
+    virtual ~VMMPredictor() {}
   /**
    * This VMMPredictor use trainingSequence and consturcts its model.
    * @param trainingSequence a sequence

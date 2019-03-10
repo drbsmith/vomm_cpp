@@ -65,7 +65,7 @@ private:
     
     /** The next sibling of this node.
      */
-    PPMNode* _nextSibling; // = NULL; // implied = null;
+    PPMNode* _nextSibling = NULL; // implied = null;
     
     // Link back up to our parent, or NULL if we don't have a parent.
     PPMNode* _parent = NULL;

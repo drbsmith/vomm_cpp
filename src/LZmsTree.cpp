@@ -20,6 +20,10 @@ LZmsTree::LZmsTree(int _minContext, int _numShifts, int _alphabetSize) : minCont
     likelihoodsSet = false;
 }
 
+LZmsTree::~LZmsTree() {
+    delete root;
+}
+
 void LZmsTree::learnSequence(std::vector<int>* sequence) {
     for (int i = 0; i <= numShifts; i++)
         learnOffsetSequence(sequence, i);

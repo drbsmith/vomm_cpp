@@ -1,6 +1,7 @@
 #include "../include/algs/com/colloquial/arithcode/PPMNode.hpp"
 #include "../include/algs/com/colloquial/arithcode/ArithCodeModel.hpp"
 
+#include <string>
 #include <sstream>
 #include <vector>
 
@@ -31,15 +32,15 @@ PPMNode::PPMNode(string data) : _firstChild(NULL), _nextSibling(NULL) {
             string::size_type first = data.find('|');
             string element = data.substr(0,first);
             data.erase(0,first+1); // erase the first part
-            _byte = stoi(element, nullptr, 10);
+            _byte = std::stoi(element, NULL, 10);
             
             first = data.find('|');
             element = data.substr(0,first);
             data.erase(0,first+1); // erase the second part
-            _count = stoi(element, nullptr, 10);
+            _count = std::stoi(element, NULL, 10);
             
             // last number goes to the end
-            _numberOfOutcomes = stoi(data, nullptr, 10);
+            _numberOfOutcomes = std::stoi(data, NULL, 10);
         } catch (exception ex) {
             ; // garbage in, garbage out!
         }
@@ -359,9 +360,9 @@ std::string PPMNode::ToString() {
 
 PPMNode* PPMNode::FromString(std::string data) {
     if (data.size() < 8)
-        return nullptr;
+        return NULL;
     
-    PPMNode* ret = nullptr;
+    PPMNode* ret = NULL;
     
     if (data[0] == 'n') {   // it's a node string
         std::vector<std::string> result;

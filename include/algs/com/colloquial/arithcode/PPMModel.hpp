@@ -43,13 +43,14 @@ private:
     const int MIN_CONTEXT_LENGTH = 1;
     
     const int BYTE_ABSIZE = 256;
-    int abSize;
     
     /** Count of bytes coded to use in pruning.
      */
     // private int _byteCount; // implied = 0; uncomment for pruning
     
 protected:
+    int abSize;
+    
     /** Model to use for short contexts. */
     ExcludingAdaptiveUnigramModel* _backoffModel = NULL;
     

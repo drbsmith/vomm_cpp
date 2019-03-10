@@ -47,6 +47,13 @@ void DCTWPredictor::init(int _abSize, int _vmmOrder) {
 void DCTWPredictor::learn(vector<int>* trainingSequence) {
     DecompositionTreeBuilder builder(abSize, vmmOrder);
     
+    // perform sanity check on the training data. Throw away anything beyond the abSize
+    for (vector<int>::iterator it = trainingSequence->begin(); it != trainingSequence->end(); )
+        if (*it >= abSize)
+            it = trainingSequence->erase(it);
+        else
+            it++;
+    
     IntSampleIter ssi(trainingSequence);
     dctw = builder.buildStatic((SampleIterator*)(&ssi));
     
@@ -81,10 +88,14 @@ void DCTWPredictor::learn(vector<int>* trainingSequence) {
 //
 //}
 double DCTWPredictor::predict(int symbol, vector<int>* context) {
+    if (symbol >= abSize)
+        return -1;
+    
     try {
         Context* ctwContext = new DefaultContext(vmmOrder);
         for (int i = 0; i < context->size(); ++i) {
-            ctwContext->add(context->at(i));
+            if ((int)context->at(i) <= abSize)
+                ctwContext->add(context->at(i));
         }
         
         double ret = dctw->predict(symbol, ctwContext);
@@ -105,7 +116,8 @@ double* DCTWPredictor::predictAll(vector<int>* context) {
     
     Context* ctwContext = new DefaultContext(vmmOrder);
     for (int i = 0; i < context->size(); ++i) {
-        ctwContext->add(context->at(i));
+        if ((int)context->at(i) <= abSize)
+            ctwContext->add(context->at(i));
     }
     
     for (int j = 0; j < abSize; j++) {
@@ -123,15 +135,18 @@ double DCTWPredictor::logEval(vector<int>* testSequence, vector<int>* initialCon
         Context* context = new DefaultContext(vmmOrder);
         if (initialContext != NULL) {
             for (int i = 0; i < initialContext->size(); ++i) {
-                context->add( (int) initialContext->at(i));
+                if ((int)initialContext->at(i) <= abSize)
+                    context->add( (int) initialContext->at(i));
             }
         }
         
         double eval = 0.0;
         for (int i = 0, sym = 0; i < testSequence->size(); ++i) {
-            sym = (int) testSequence->at(i);
-            eval += log(dctw->predict(sym, context));
-            context->add(sym);
+            if ((int)testSequence->at(i) <= abSize) {
+                sym = (int) testSequence->at(i);
+                eval += log(dctw->predict(sym, context));
+                context->add(sym);
+            }
         }
         
         return eval * NEGTIVE_INVERSE_LOG_2;
@@ -144,4 +159,11 @@ double DCTWPredictor::logEval(vector<int>* testSequence, vector<int>* initialCon
             throw ex; // npe;
         }
     }
+}
+
+string DCTWPredictor::ModelToString() {
+    return dctw->toString();
+}
+void DCTWPredictor::ModelFromString(string data) {
+    dctw->fromString(data);
 }

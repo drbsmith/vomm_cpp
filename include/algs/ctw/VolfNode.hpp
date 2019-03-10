@@ -116,18 +116,23 @@ public:
 
 private:
   vector<double>* predict(ContextIterator* context) {
+      if (symCountArr.size() != abSize)
+          return NULL;  // not initialized properly
+      
     if (context->hasNext()) {
       VolfNode* childOnContextPath = getChild(context->nextSymbol());
         if (!childOnContextPath)
             return NULL;    // symbol was out of range.
         
       vector<double>* ethaArr = childOnContextPath->predict(context);
+        if (!ethaArr)
+            return NULL;    // error condition
       double denominator = 0.0;
       //1. compute b'
       double betaTag = beta / (double)(allCount + abSizeDivAlpha);
       //2. compute intermediate result etha(context, sym)
-      for(int sym=0; sym<abSize; ++sym) {
-        ethaArr->at(sym) += betaTag * (symCountArr[sym]+alphaInversed);/**@todo (2)*/
+      for (int sym = 0; sym < abSize; ++sym) {
+        ethaArr->at(sym) += betaTag * (symCountArr.at(sym) + alphaInversed);
         denominator += ethaArr->at(sym);
       }
       //3. compute conditional weighted probabilities
@@ -148,12 +153,17 @@ private:
 
 
   vector<double>* learnAll(int newSymbol, ContextIterator* context) {
+      if (symCountArr.size() != abSize)
+          return NULL;  // not initialized properly
+      
     if (context->hasNext()) {
 
       VolfNode* childOnContextPath = getChild(context->nextSymbol());
         if (childOnContextPath == NULL)
             return NULL;    // error on nextSymbol
       vector<double>* ethaArr = childOnContextPath->learnAll(newSymbol, context);
+        if (ethaArr == NULL || ethaArr->size() < newSymbol+1);
+            return NULL;    // error
       double childOnContextPw = ethaArr->at(newSymbol);
       double denominator = 0.0;
       //1. compute b'

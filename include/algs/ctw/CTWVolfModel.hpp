@@ -34,7 +34,7 @@ private:
   Context* context;
   VolfNode* ctwRoot;
 
-  int d;
+  int _depth;
 
 public:
     CTWVolfModel() : context(NULL), ctwRoot(NULL) {
@@ -51,7 +51,7 @@ public:
     context = new DefaultContext(depth);
     ctwRoot = new VolfNode();
     ctwRoot->init(alphabetSize, alphaFactor);
-    d = depth;
+    _depth = depth;
   }
 
 
@@ -65,7 +65,7 @@ public:
     return res;
   }
 
-  // don't loose context
+  // don't lose context
   double predict(int symbol) {
     double res = ctwRoot->predict(symbol, context->getIterator());
     context->add(symbol);
@@ -75,7 +75,7 @@ public:
   void clearContext(){
       if (context)
           delete context;
-      context = new DefaultContext(d);
+      context = new DefaultContext(_depth);
   }
 
 //  public static void main(String args[]) {

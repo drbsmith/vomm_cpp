@@ -56,8 +56,8 @@ LZNode::~LZNode() {
     if (children != NULL) {
         delete children;
     }
-    if (parent != NULL)
-        delete parent;
+//    if (parent != NULL)
+//        delete parent;
 }
 
 int LZNode::GetAlphabetSize() {
@@ -104,6 +104,9 @@ void LZNode::setLikelihoods() {
     
     vector<LZNode* > * childNodes = (vector<LZNode*>*)(children->toArray());
     
+    if (childNodes == NULL)
+        return;
+    
     if (childNodes->size() > 0) {
         double inverseNumLeaves = 1.0 / (double)numLeaves;
         for (int i = 0; i < childNodes->size(); i++) {
@@ -116,6 +119,8 @@ void LZNode::setLikelihoods() {
     
     for (int i = 0; i < childNodes->size(); i++)
         childNodes->at(i)->setLikelihoods();
+    
+    delete childNodes;  // clean up
 }
 
 int LZNode::getAlphabetSize() {

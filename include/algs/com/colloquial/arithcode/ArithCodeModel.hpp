@@ -118,6 +118,8 @@ public:
      * @since 1.1
      */
     virtual void increment(int symbol) =0;
+    
+    virtual ~ArithCodeModel() =0;
     };
 }
 

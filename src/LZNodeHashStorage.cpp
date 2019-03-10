@@ -10,6 +10,12 @@
 #include "../include/algs/lzms/LZNodeHashStorage.hpp"
 
 using namespace vmm_algs_lzms;
+LZNodeHashStorage::~LZNodeHashStorage() {
+    for (std::map< int, LZmsNode* >::iterator it = storage.begin(); it != storage.end(); it++)
+        delete it->second;
+    
+    storage.clear();
+}
 
 void LZNodeHashStorage::put(int key, LZmsNode* node) {
     //            if (storage == NULL) {
@@ -39,4 +45,4 @@ std::vector<LZmsNode*>* LZNodeHashStorage::toArray() {
     //            System.arraycopy(objects, 0, result, 0, objects.length);
     
     return result;
-    }
+}

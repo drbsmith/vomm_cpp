@@ -43,15 +43,14 @@ public:
     }
 
     double predict(int sym, vmm_util::Context* context){
-    if (sym == mySym) {
-      return 1.0;
+        if (sym == mySym) {
+          return 1.0;
+        } else {
+            std::stringstream ss;
+            ss << "BinDLeaf: Never Should Happen! with sym="  << sym << " this.sym=" << mySym;
+            throw ss.str();
+        }
     }
-    else{
-        std::stringstream ss;
-        ss << "BinDLeaf: Never Should Happen! with sym="  << sym << " this.sym=" << mySym;
-        throw ss.str();
-    }
-  }
 
 //  public void train(int symbol){
 //    //NoOp
