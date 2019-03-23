@@ -103,6 +103,11 @@ public:
      */
     PPMNode(std::string data);
     
+    /** Destructor
+     */
+    ~PPMNode();
+    
+    
     PPMNode* GetFirstChild();
     void SetFirstChild(PPMNode* child);
     int GetByte();

@@ -14,6 +14,7 @@ but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
 GNU General Public License (<a href="http://www.gnu.org/copyleft/gpl.html">GPL</a>) for more details.*/ 
 
+#include <unordered_map>
 #include <string>
 #include <vector>
 
@@ -43,17 +44,21 @@ namespace vmm_algs_pst {
 
 class DefaultPSTNode : public PSTNodeInterface {
 
+    typedef std::pair<int, DefaultPSTNode*> PSTNode;
+    typedef unordered_map<PSTNode::first_type, PSTNode::second_type> PSTChildren;
+    
 private:
     const static string XML_NODE_ST, XML_NODE_ET, TOSTRING_INIT, XML_EXCEP_AND, XML_EXCEP_LT,XML_ID_CDATA_ST;
     const static string XML_ID_CDATA_ET, XML_ID_ST, XML_ID_ET, XML_PROB_ST, XML_PROB_ET, XML_PROB_CDATA_ST;
     const static string XML_PROB_CDATA_ET, XML_CHILDREN_ST, XML_CHILDREN_ET;
 
-    const static int ABSIZE = 256;
+    const static int ABSIZE = 256;  // default if not supplied
 public:
     // BDS: Do these properties need to be public? Not very safe...
-    string idStr;/*ZZZ*/
+    vector<int> idStr;
     vector<double> *nextSymProbability;/*ZZZ*/
-    vector<DefaultPSTNode*>* children;/*ZZZ*/
+    PSTChildren* children;
+//    vector<DefaultPSTNode*>* children;/*ZZZ*/
     bool isLeaf;/*ZZZ*/
 
     int absize;
@@ -62,41 +67,38 @@ public:
 
     DefaultPSTNode(int alphabetSize);
 
-    DefaultPSTNode(string idStr, vector<double>* nextSymProbability);
+    DefaultPSTNode(vector<int>* idStr, vector<double>* nextSymProbability);
     
     virtual ~DefaultPSTNode();
 
     int getAlphabetSize();
-    string getString();
+    vector<int>* getIDString();
 
     double predict(int ch);
     double predict(string charSeq);
+    double predict(vector<int>* charSeq);
     double predict(Byte b);
     double predict(vector<Byte> *bytes);
     
-    void predict(vector<double> *pArr);
+    vector<double>* predict();
 
   /**
    * @returns PSTNodeInterface corresponds to the largest suffix of the string defined
    *          by seq.
    */
-//  PSTNodeInterface* get(string seq){
-//    StringBuffer sbuff = new StringBuffer(seq.toString());
-//    return get(sbuff);
-//  }
-
   /**
    * @returns PSTNodeInterface corresponds to the largest suffix of the byteSeq
    */
     PSTNodeInterface* get(vector<Byte> *byteSeq);
     PSTNodeInterface* get(ContextIterator* context);
     PSTNodeInterface* get(string sbuff);
-    PSTNodeInterface* get(char symbol);
+    PSTNodeInterface* get(vector<int>* sbuff);
+    PSTNodeInterface* get(int symbol);
 
 private:
     PSTNodeInterface* get(vector<Byte> *bytes, int currentByteIndex);
 
-    void insert(char symbol, vector<double>* nextSymProbability);
+    void insert(int symbol, vector<double>* nextSymProbability);
 
 public:
     /**
@@ -104,70 +106,14 @@ public:
      */
     int subTreeHeight();
     
-//   PSTNodeInterface load(File source){
-//    try{
-//      FileInputStream fin = new FileInputStream(source);
-//      ObjectInputStream in = new ObjectInputStream(fin);
-//      readObject(in);
-//      in.close();
-//    }catch(Exception e){
-//      e.printStackTrace();
-//    }
-//    return this;
-//  }
-//
-//  void save(File dest){
-//    try{
-//      FileOutputStream fout = new FileOutputStream(dest);
-//      ObjectOutputStream out = new ObjectOutputStream(fout);
-//      writeObject(out);
-//      out.close();
-//    }catch(Exception e){
-//      e.printStackTrace();
-//    }
-//  }
-
     string toString();
+    static DefaultPSTNode* FromString(string data);    // reconstitute from serialized string
 
+    static vector<double>* str2Prob(string data, int absize);
 private:
     string prob2Str();
 
-
-//  private void writeObject(java.io.ObjectOutputStream out) throws IOException{
-//    out.writeObject(idStr);
-//    out.writeInt(nextSymProbability.length);
-//    for(int i=0; i<nextSymProbability.length; ++i)
-//      out.writeDouble(nextSymProbability[i]);
-//    out.writeInt(children.length);
-//    Vector v = new Vector(children.length);
-//    Vector vInd = new Vector(children.length);
-//    for(int i=0; i<children.length; ++i){
-//      if(children[i]!=null){ v.add(children[i]); vInd.add(new Integer(i)); }
-//    }
-//    out.writeInt(v.size());
-//    for(int i=0, test=v.size(); i<test; ++i){
-//      out.writeInt(((Integer)vInd.elementAt(i)).intValue());
-//      out.writeObject(v.elementAt(i));
-//    }
-//
-//    out.writeObject(v);
-//  }
-//  private void readObject(java.io.ObjectInputStream in)
-//     throws IOException, ClassNotFoundException{
-//   idStr = (String)in.readObject();
-//   int nsPLen = in.readInt();
-//   nextSymProbability = new double[nsPLen];
-//   for(int i=0; i<nsPLen; ++i)
-//     nextSymProbability[i] = in.readDouble();
-//   int childLen = in.readInt();
-//   children = new DefaultPSTNode[childLen];
-//   int elmSize = in.readInt();
-//   for(int i=0,ind=0; i<elmSize; ++i){
-//     ind = in.readInt();
-//     children[ind] = (DefaultPSTNode)in.readObject();
-//   }
-// }
-
+    static string GetOneNode(string data);  // parse one node's worth of data from the string
 };
 
 }

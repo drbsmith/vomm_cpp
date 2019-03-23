@@ -56,7 +56,7 @@ protected:
     
     /** Nodes at depth 1 in the model. All order 0 nodes are included in the unigram
      */
-    vector<PPMNode*> _contexts;/* ron = new PPMNode[abSize];*/
+    vector<PPMNode*> _contexts;
     
     /** Maximum context length to search in trie.  Maximum count will
      * be for maximum context length plus one.
@@ -83,7 +83,7 @@ protected:
     
     /** Storage for the excluded bytes
      */
-    ByteSet* _excludedBytes = NULL;/*@ron = new ByteSet(abSize);*/
+    ByteSet* _excludedBytes = NULL;
 
     /** Construct a new model with the specified maximum length of
      * context to use for prediction.

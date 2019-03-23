@@ -7,14 +7,16 @@
 //
 
 // defines to test each of the vomm algorithms
-//#define TEST_PST
+#define TEST_PST
 //#define TEST_BIN
 //#define TEST_DCTW
 //#define TEST_PPMC
-#define TEST_LZMS
+//#define TEST_LZMS
+
+#define TEST_SERIALIZATION
 
 #define ALPHA_SIZE 256
-//#define TRAINING_SIZE 100
+//#define TRAINING_SIZE 1000
 
 #include <iostream>
 #include <vector>
@@ -35,26 +37,54 @@ using namespace std;
 
 int main(int argc, const char * argv[]) {
     vector<int> dataVec;
+    double* prob;
 #ifdef TRAINING_SIZE
     for (int i = 0; i < TRAINING_SIZE; i++)
         dataVec.push_back(rand() % ALPHA_SIZE);
 #else
     int data[] = {97, 98, 114, 97, 99, 97, 100, 97, 98, 114, 97}; // same as seq = "abracadabra"
-    string test = "The quick brown fox jumped over the lazy dog.";
+    string test = "abracadabra"; // "The quick brown fox jumped over the lazy dog.";
     for (int i = 0; i < test.size(); i++)
         dataVec.push_back(test[i]);
 #endif
     
 #ifdef TEST_PST
     cout << "PST: " << endl;
-    PSTPredictor pst;
+    PSTPredictor* pst = new PSTPredictor();;
     
-    pst.init(ALPHA_SIZE, 0.001, 0.0, 0.0001, 1.05, 20);
-    pst.learn(&dataVec);
+    pst->init(ALPHA_SIZE, 0.001, 0.0, 0.0001, 1.05, 20);
+    pst->learn(&dataVec);
     
-    cout << "logeval : " << pst.logEval("cadabra") << endl;
-    cout << "P(c|abra) : " << pst.predict('c', "abra") << endl << endl;
+    cout << "logeval : " << pst->logEval("cadabra") << endl;
+    cout << "P(c|abra) : " << pst->predict('c', "abra") << endl;
+    cout << "P(r|dab) : " << pst->predict('r', "dab") << endl;
+    cout << "P(c|ra) : " << pst->predict('c', "ra") << endl;
+    cout << "P(c|bra) : " << pst->predict('c', "bra") << endl;
+    cout << "P(c|abcd) : " << pst->predict('c', "abcd") << endl;
+    cout << "P(d|ra) : " << pst->predict('d', "ra") << endl << endl;
+    
+    for (int i = 0; i < 1000; i++)
+        prob = pst->predictAll("abrac");
+    cout << "P(all) : " << prob[99] << endl << endl;
+    delete prob;
+    
+#ifdef TEST_SERIALIZATION
+    string pstModel = pst->ModelToString();
+    pstModel = pstModel.substr(0, pstModel.size()-50);
+    cout << pstModel << endl;
+    
+    delete pst;
+    pst = new PSTPredictor();
+    pst->ModelFromString(pstModel);
+    
+//    pstModel = pst.ModelToString();
+//    cout << pstModel << endl;
+    
+    cout << "Reconstituted from serialized string:" << endl;
+    cout << "logeval : " << pst->logEval("cadabra") << endl;
+    cout << "P(c|abra) : " << pst->predict('c', "abra") << endl << endl;
 #endif
+#endif // PST
 #ifdef TEST_BIN
     cout << "Binary CTW:" << endl;
     BinaryCTWPredictor ctw;
@@ -103,39 +133,34 @@ int main(int argc, const char * argv[]) {
 #endif
 #ifdef TEST_PPMC
     cout << "PPMC:" << endl;
-    PPMCPredictor ppmc;
-    ppmc.init(ALPHA_SIZE, 5);
-//    for (int i = 0; i < 4; i++) {
-//        ppmc.learn("abracadabra");
-//    }
-//    for (int i = 0; i < 11; i++) {
-//        int j = data[i];
-//        ppmc.learn(&j, 1);
-//    }
-    ppmc.learn(&dataVec);
+    PPMCPredictor* ppmc = new PPMCPredictor();
+    ppmc->init(ALPHA_SIZE, 5);
     
-    cout << "logeval : " << ppmc.logEval("cadabra") << endl;
+    ppmc->learn(&dataVec);
+    
+    cout << "logeval : " << ppmc->logEval("cadabra") << endl;
 //    cout << "logeval : " << ppmc.logEval("cadabra") << endl;
 //    cout << "logeval : " << ppmc.logEval("cadabra") << endl;
-    cout << "P(c|abra) : " << ppmc.predict('c', "abra") << endl;
-    cout << "P(c|dab) : " << ppmc.predict('c', "dab") << endl;
-    cout << "P(c|ra) : " << ppmc.predict('c', "ra") << endl;
-    cout << "P(c|bra) : " << ppmc.predict('c', "bra") << endl;
-    cout << "P(c|abcd) : " << ppmc.predict('c', "abcd") << endl;
-    cout << "P(d|ra) : " << ppmc.predict('d', "ra") << endl << endl;
-//    for (int i = 0; i < 256; i++) {
-//        cout << ppmc.predict(i, "abra") << ", ";
-//    }
-//    double* pred = ppmc.predictAll("abra");
-//    for (int i = 0; i < 256; i++) {
-//        cout << pred[i] << ", ";
-//    }
-//    delete [] pred;
+    cout << "P(c|abra) : " << ppmc->predict('c', "abra") << endl;
+    cout << "P(c|dab) : " << ppmc->predict('c', "dab") << endl;
+    cout << "P(c|ra) : " << ppmc->predict('c', "ra") << endl;
+    cout << "P(c|bra) : " << ppmc->predict('c', "bra") << endl;
+    cout << "P(c|abcd) : " << ppmc->predict('c', "abcd") << endl;
+    cout << "P(d|ra) : " << ppmc->predict('d', "ra") << endl << endl;
     
-    string model = ppmc.ModelToString();    // get the model encoded as an ascii string
+//    for (int i = 0; i < 1000; i++)
+//        prob = pst.predictAll("abrac");
+//    cout << "P(all) : " << prob[96] << endl;
+//    delete prob;
     
-    ppmc.init(ALPHA_SIZE,5);
-    ppmc.ModelFromString(model);    // reconstitute the model from the ascii string!
+#ifdef TEST_SERIALIZATION
+    string model = ppmc->ModelToString();    // get the model encoded as an ascii string
+    
+    delete ppmc;
+    ppmc = new PPMCPredictor();
+    
+    ppmc->init(ALPHA_SIZE,5);
+    ppmc->ModelFromString(model);    // reconstitute the model from the ascii string!
     
     // Could also feed the model in 1 line at a time:
 //    ppmc.ModelFromString("n 97|1|3 [100|1|1 [97|1|1 [98|1|1 [114|1|1 [97|1|0]]]] {99|1|1 [97|1|1 [100|1|1 [97|1|1 [98|1|0]]]] {98|5|1 [114|4|1 [97|3|1 [99|2|1 [97|1|0]]]]}}]");
@@ -144,16 +169,16 @@ int main(int argc, const char * argv[]) {
 //    ppmc.ModelFromString("n 114|1|1 [97|1|1 [99|1|1 [97|1|1 [100|1|1 [97|1|0]]]]]");
     
     cout << "PPMC (reconstituted):" << endl;
-    cout << "logeval : " << ppmc.logEval("cadabra") << endl;
-    cout << "P(c|abra) : " << ppmc.predict('c', "abra") << endl;
-    cout << "P(c|dab) : " << ppmc.predict('c', "dab") << endl;
-    cout << "P(c|ra) : " << ppmc.predict('c', "ra") << endl;
-    cout << "P(c|bra) : " << ppmc.predict('c', "bra") << endl;
-    cout << "P(c|abcd) : " << ppmc.predict('c', "abcd") << endl;
-    cout << "P(d|ra) : " << ppmc.predict('d', "ra") << endl << endl;
-//
-//    cout << ppmc.ModelToString();
-#endif
+    cout << "logeval : " << ppmc->logEval("cadabra") << endl;
+    cout << "P(c|abra) : " << ppmc->predict('c', "abra") << endl;
+    cout << "P(c|dab) : " << ppmc->predict('c', "dab") << endl;
+    cout << "P(c|ra) : " << ppmc->predict('c', "ra") << endl;
+    cout << "P(c|bra) : " << ppmc->predict('c', "bra") << endl;
+    cout << "P(c|abcd) : " << ppmc->predict('c', "abcd") << endl;
+    cout << "P(d|ra) : " << ppmc->predict('d', "ra") << endl << endl;//
+#endif // TEST_SERIALIZATION
+    delete ppmc;
+#endif // PPMC
 #ifdef TEST_LZMS
     cout << "LZms: " << endl;
     LZmsPredictor lzms;

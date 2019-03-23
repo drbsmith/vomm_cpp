@@ -56,7 +56,7 @@ double DecompVolfNode::predict(int symbol, int symSetLabel, ContextIterator* con
     //        vmm.util.PerdictAssertion.assertThis(pwArr);
     if (pwArr) {
         double ret = pwArr[symSetLabel];
-        delete pwArr;
+        delete[] pwArr;
         return ret;
     } else
         return -1;
@@ -67,7 +67,7 @@ double DecompVolfNode::learn(int symbol, int symSetLabel, ContextIterator* conte
     //        vmm.util.PerdictAssertion.assertThis(res);
     if (res) {
         double ret = res[symSetLabel];
-        delete res;
+        delete[] res;
         return ret;
     } else
         return -1;

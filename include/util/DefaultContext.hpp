@@ -2,6 +2,7 @@
 #define _DEFAULTCONTEXT_HPP
 
 #include <string>
+#include <vector>
 #include "Context.hpp"
 
 /* HEADER
@@ -39,47 +40,52 @@ private:
   /*Context collection, a symbol is access by its int id.
      ie ASCII id.
    */
-  int* context;
-unsigned int context_len;
-  int nextAddIndex;
+    std::vector<int> context; //int* context;
+    unsigned int context_len;
+//    int nextAddIndex;
 
-  /*Indicates the size of the population in context[]*/
-  int population;
+  /*Indicates the size of the population in context[]*/ // not needed, vector.size will always be population size
+//    int population;
 
   /*Iteration index*/
-  int iterInd;
-  int iterCount;
+    int iterInd;
+    int iterCount;
 
 public:
     DefaultContext(int maxlength) : context_len(maxlength) {
-        _assert(maxlength > 0, "context length<=0");
-        context = new int[maxlength];
-        nextAddIndex = 0;
-        population = 0;
+//        _assert(maxlength > 0, "context length<=0");  // just don't create one with < 1 maxlength, it will never store anything.
+//        context = new int[maxlength];
+//        nextAddIndex = 0;
+//        population = 0;
         iterInd = 0;
         iterCount = 0;
     }
 
-    void add(int symbol){
-        context[nextAddIndex] = symbol;
-        nextAddIndex = (nextAddIndex+1) % context_len;
-        population = isFull() ? population : population+1;
+    void add(int symbol) {
+        while (context.size() >= context_len && context_len > 0)
+            context.erase(context.begin());
+        
+        context.push_back(symbol);
+        
+//        context[nextAddIndex] = symbol;
+//        nextAddIndex = (nextAddIndex+1) % context_len;
+//        population = isFull() ? population : population+1;
     }
 
     /*Note: this implemntation is not safe*/
-    ContextIterator* getIterator(){
-        iterInd = indexBefore(nextAddIndex);
+    ContextIterator* getIterator() {    // we hand out the contents of our vector in reverse order added (from end to begin)
+        iterInd = (int)context.size()-1; // indexBefore(nextAddIndex);
         iterCount = 0;
         return (ContextIterator*)this;
     }
 
     bool hasNext(){
-        return iterCount != population;
+        return iterCount != context.size();
     }
 
     int nextSymbol(){
-        int sym = context[iterInd];
-        iterInd = indexBefore(iterInd);
+        int sym = context.at(iterInd); // context[iterInd];
+        iterInd--; // = indexBefore(iterInd);
         iterCount++;
         return sym;
     }
@@ -93,20 +99,20 @@ public:
 //        }
 //    }
 
-private:
-  int indexBefore(int index){
-    return (index==0)? context_len-1 : (index-1);
-  }
+//private:
+//  int indexBefore(int index){
+//    return (index==0)? context_len-1 : (index-1);
+//  }
 
-  bool isFull(){
-    return (population == context_len);
-  }
+//  bool isFull(){
+//    return (population == context_len);
+//  }
 
-    void _assert(bool condition, std::string descp) {
-        if (false == condition) {
-            throw "Assertion Failed: " + descp;
-        }
-    }
+//    void _assert(bool condition, std::string descp) {
+//        if (false == condition) {
+//            throw "Assertion Failed: " + descp;
+//        }
+//    }
 
 };
 

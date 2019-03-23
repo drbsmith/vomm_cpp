@@ -86,18 +86,20 @@ double LZmsTree::getProbablityOfSequence(std::vector<int>* sequence) {
             for (int j = i; j < mark && currentNode != NULL; j++)
                 currentNode = currentNode->getChild(sequence->at(j));
             
-            if (currentNode == NULL) // the trace was broken. no similar path exists!
-                currentNode = root; // currentNode will have to be root.
-            
             i = mark; // continue from where we started.
         }
         
-        // get the child.
-        child = currentNode->getChild(sequence->at(i));
+        if (currentNode == NULL) // the trace was broken. no similar path exists! <-- used to be before i = mark, but this makes more sense
+            currentNode = root; // currentNode will have to be root.
         
-        if (child != NULL)
+        // get the child.
+        if (currentNode)    // unless root is invalid...
+            child = currentNode->getChild(sequence->at(i));
+        
+        if (child)
             result += child->getLogLikelihoodFromParent();
-        else result += currentNode->getLogLikelihoodToVirtualChild();
+        else
+            result += currentNode->getLogLikelihoodToVirtualChild();
         
         currentNode = child;
     }

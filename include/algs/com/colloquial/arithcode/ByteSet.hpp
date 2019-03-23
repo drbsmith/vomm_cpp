@@ -45,7 +45,7 @@ public:
       abSize = alphabetSize;
         for (int i = 0; i < abSize; i++)
             bitSet.push_back(false);
-//      bitSet = new BitSet(abSize);
+        
       symCount = 0;
     }
 

@@ -171,8 +171,8 @@ private:
     /** Moves bytes in context down to start of buffer.
      */
     void tampDown() {
-        for (int i = 0; i < _offset; i++)
-            _symbols.erase(_symbols.begin());
+//        for (int i = 0; i < _offset; i++)
+            _symbols.erase(_symbols.begin(), _symbols.begin()+_offset);
 //        for (int i = 0; i < _length-1; ++i) {
 //            _symbols[i] = _symbols[_offset+i+1];
 //        }

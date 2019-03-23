@@ -42,7 +42,7 @@ namespace vmm_algs_ppmc {
      * <p>
      * Usage example:
      *
-     * PPMCPredictor ppmc = new PPMCPredictor();
+     * PPMCPredictor ppmc;
      * ppmc.init(256, 5);
      * ppmc.learn("abracadabra");
      * System.out.println("logeval : " + ppmc.logEval("cadabra"));

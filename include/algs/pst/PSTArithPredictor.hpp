@@ -51,13 +51,13 @@ public:
   /**
    * @see arith.ArithPredictor
    */
-  void predict(vector<double>* prediction){
+  vector<double>* predict(){
       if (pst == NULL || context == NULL)
-          return;
+          return NULL;
       
     PSTNodeInterface* contextNode = pst->get(context->getIterator());
       
-    contextNode->predict(prediction);   // fills prediction with the probabilities from contextNode
+    return contextNode->predict();   // fills prediction with the probabilities from contextNode
   }
 
   /**

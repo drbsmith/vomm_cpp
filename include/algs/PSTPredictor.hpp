@@ -14,6 +14,7 @@
  GNU General Public License (<a href="http://www.gnu.org/copyleft/gpl.html">GPL</a>) for more details.*/
 
 #include "../pred/VMMPredictor.hpp"
+#include "pst/PSTArithPredictor.hpp"
 #include "pst/PSTNodeInterface.hpp"
 
 #include "math.h"
@@ -48,9 +49,12 @@ namespace vmm_algs_pst {
         int abSize;
         double pMin, alpha, gamma, r;
         int vmmOrder;
+        
+        bool trained;   // flag to escape predicts before being built
 
         PSTNodeInterface* pst;  // handle to the tree
 
+        PSTArithPredictor* pstPredictor;   // used for predictions, save for CPU efficiency
     public:
         PSTPredictor();
         
@@ -78,8 +82,8 @@ namespace vmm_algs_pst {
         
         double* predictAll(vector<int>* context);
         
-        string ModelToString() { return ""; };
-        void ModelFromString(string data) { };
+        string ModelToString();
+        void ModelFromString(string data);
         
         void learn(string s) { VMMPredictor::learn(s); }
         double predict(int symbol, string context) { return VMMPredictor::predict(symbol, context); }

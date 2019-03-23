@@ -5,14 +5,13 @@ using namespace vmm_algs_com_colloquial_arithcode;
 PPMModel::PPMModel(int maxContextLength) {
      _maxContextLength = maxContextLength;
      _buffer = new ByteBuffer(maxContextLength+1);
-//         _buffer = new ByteBuffer(maxContextLength+1);
 
     /*@ron */
     abSize = BYTE_ABSIZE;
     _backoffModel =  new ExcludingAdaptiveUnigramModel(abSize);
      for (int i = 0; i < abSize; i++)
          _contexts.push_back(NULL); //new PPMNode(i, NULL));
-//        _contexts = new PPMNode[abSize];
+    
     _excludedBytes = new ByteSet(abSize);
 
 }
@@ -21,13 +20,12 @@ PPMModel::PPMModel(int maxContextLength) {
 PPMModel::PPMModel(int maxContextLength, int alphabetSize) {
     _maxContextLength = maxContextLength;
     _buffer = new ByteBuffer(maxContextLength+1);
-//        _buffer = new ByteBuffer(maxContextLength+1);
 
     abSize = alphabetSize;
     _backoffModel =  new ExcludingAdaptiveUnigramModel(abSize);
     for (int i = 0; i < abSize; i++)
         _contexts.push_back(NULL); //new PPMNode(i, NULL));
-//        _contexts = new PPMNode[abSize];
+    
     _excludedBytes = new ByteSet(abSize);
 }
 

@@ -36,7 +36,7 @@ namespace vmm_algs_pst {
 class PSTBuilder {
 
 private:
-    const int ALPHABET_RANGE = 256;//ascii
+    const int ALPHABET_RANGE = 256;//ascii // default if not supplied
 //    const int S_INITIAL_SIZE = 1024;//ascii
     const int UNSIGNED_BYTE_MASK = 0xFF;
 
@@ -50,7 +50,8 @@ private:
     Samples* samples;
 
   //seperated to save object creation.
-    vector<string> queryStrs;
+    vector<vector<int>* > queryStrs;
+//    vector<string> queryStrs;
     vector<vector<double>*> suffStrNextSymProb; // queryStrs && suffStrNext.. have to be the same size, always! Should really use a pair in a single vector
     
     PSTNodeInterface* pstRoot;
@@ -92,17 +93,17 @@ private:
 
     bool isConditionBGolan(vector<double> *StrNSymProb, vector<double> *suffStrNSymProb, int numHits, double r);
 
-    void updateQueryStrsGolan(string str, vector<double>* nextSymProb, int nMin);
+    void updateQueryStrsGolan(vector<int>* str, vector<double>* nextSymProb, int nMin);
 
-    void updateQueryStrs(string str, vector<double>* nextSymProb, double pMin);
+    void updateQueryStrs(vector<int>* str, vector<double>* nextSymProb, double pMin);
 
     vector<double>* smooth(vector<double> *prob, double nsMinP);
 
     PSTNodeInterface* createPSTRoot(vector<double>* nextSymProb);
 
-    void addToTree(string str, vector<double> *strNSymProb, double nextSymProbMin);
+    void addToTree(vector<int>* str, vector<double> *strNSymProb, double nextSymProbMin);
 
-    void initHitCounts(string str);
+    void initHitCounts(vector<int>* str);
 
     vector<double> *computeNextSymProb(vector<double> *retVal);
 

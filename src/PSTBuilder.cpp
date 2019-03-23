@@ -31,16 +31,20 @@ PSTBuilder::PSTBuilder(int abSize) : seenAlphabet(NULL), samples(NULL), pstRoot(
 }
 
 PSTBuilder::~PSTBuilder() {
-    if (samples)
-        delete samples;
 //    if (pstRoot)  // this gets passed out to the build caller, they will free it.
 //        delete pstRoot;
+    if (seenAlphabet)
+        delete seenAlphabet;
+    if (samples)
+        delete samples;
+    
     for (int i = 0; i < suffStrNextSymProb.size(); i++)
         if (suffStrNextSymProb.at(i) != NULL) {
             delete suffStrNextSymProb.at(i);    //TODO: because the same vector is added many times it can't be deleted...something must be wrong there!
         }
-    if (seenAlphabet)
-        delete seenAlphabet;
+    for (int i = 0; i < queryStrs.size(); i++)
+        if (queryStrs.at(i) != NULL)
+            delete queryStrs.at(i);
 }
 
 PSTNodeInterface* PSTBuilder::build(Samples* _samples, double pMin, double alpha,
@@ -50,7 +54,7 @@ PSTNodeInterface* PSTBuilder::build(Samples* _samples, double pMin, double alpha
     init(pMin, nextSymProbMin);
     
     //start building the PST
-    string str;
+    vector<int>* str;
     vector<double> strNSymProb; // = new vector<double>();
     vector<double>* suffStrNSymProb = NULL;
     
@@ -58,14 +62,14 @@ PSTNodeInterface* PSTBuilder::build(Samples* _samples, double pMin, double alpha
         str = *(queryStrs.begin());
         suffStrNSymProb = *(suffStrNextSymProb.begin());
 
-        initHitCounts(str);
+        initHitCounts(str); // 0 out the strCharHits and charStrHits vectors
         
         computeNextSymProb(&strNSymProb);
 
         if (isConditionB(&strNSymProb, suffStrNSymProb, alpha, nextSymProbMin, addedValThreshold)) {
             addToTree(str, &strNSymProb, nextSymProbMin);
         }
-        if (str.length() < strMaxLength)
+        if (str->size() < strMaxLength)
             updateQueryStrs(str, &strNSymProb, pMin);
         
         queryStrs.erase(queryStrs.begin()); //0);
@@ -92,7 +96,7 @@ PSTNodeInterface* PSTBuilder::buildGolanPST(Samples* _samples, int nMin, int min
     initGolan(nextSymProbMin);
     
     //start building the PST
-    string str;
+    vector<int>* str;
     vector<double> strNSymProb;
     vector<double>* suffStrNSymProb;
     
@@ -106,7 +110,7 @@ PSTNodeInterface* PSTBuilder::buildGolanPST(Samples* _samples, int nMin, int min
         if (isConditionBGolan(&strNSymProb, suffStrNSymProb, minNumHits, r)) {
             addToTree(str, &strNSymProb, nextSymProbMin);
         }
-        if (str.length() < strMaxLength)
+        if (str->size() < strMaxLength)
             updateQueryStrsGolan(str, &strNSymProb, nMin);
         
         queryStrs.erase(queryStrs.begin()); //0);
@@ -147,13 +151,13 @@ void PSTBuilder::init(double pMin, double nextSymProbMin){
     
     //init seenALPHABET & queryStrs
     vector<double> *prob = new vector<double>(alphabetSize, 0); // double[alphabetSize];
-    stringstream ss;
+    vector<int>* str;
     for (int i = 0; i < alphabetSize; ++i) {
         prob->at(i) = (double)strCharHits[i]/(double)allLength;
         if (prob->at(i) > pMin) {
-            ss.str("");
-            ss << (char)i;
-            queryStrs.push_back(ss.str()); //(char)i);
+            str = new vector<int>();
+            str->push_back(i);
+            queryStrs.push_back(str); //(char)i);
 //            suffStrNextSymProb.push_back(prob); // TODO: something funny here. The same vector gets added over and over, and gets changed in the loop. Would it make a copy in Java, so it's adding versions of the array? Or else why is the same thing added over and over?
         }
     }
@@ -200,12 +204,12 @@ void PSTBuilder::initGolan(double nextSymProbMin){
     
     //init seenALPHABET & queryStrs
     vector<double> *prob = new vector<double>; //(alphabetSize);
-    stringstream ss;
+    vector<int>* str;
     for(int i=0; i<alphabetSize; ++i){
         prob->at(i) = ((double)strCharHits[i])/allLength;
-        ss.str("");
-        ss << i;
-        queryStrs.push_back(ss.str()); //(char)i);
+        str = new vector<int>();
+        str->push_back(i);
+        queryStrs.push_back(str); //(char)i);
         suffStrNextSymProb.push_back(prob);
     }
     
@@ -252,31 +256,37 @@ bool PSTBuilder::isConditionBGolan(vector<double> *StrNSymProb, vector<double> *
     return false;
 }
 
-void PSTBuilder::updateQueryStrsGolan(string str, vector<double>* nextSymProb, int nMin){
+void PSTBuilder::updateQueryStrsGolan(vector<int>* str, vector<double>* nextSymProb, int nMin){
     
     for(int i=0; i<alphabetSize; ++i){
         if( charStrHitsPerSample[i]> nMin){
-            queryStrs.push_back(((char)i)+str);
+            vector<int>* newStr = new vector<int>();
+            newStr->push_back(i);
+            newStr->insert(newStr->end(), str->begin(), str->end());
+            queryStrs.push_back(newStr);
             suffStrNextSymProb.push_back(nextSymProb);
         }
     }
 }
 
 
-void PSTBuilder::updateQueryStrs(string str, vector<double>* nextSymProb, double pMin){
+void PSTBuilder::updateQueryStrs(vector<int>* str, vector<double>* nextSymProb, double pMin){
     double allPossibleMatches = 0;
     
     if (!samples)
         return;
     
     int test = (int)samples->size();
-    int chStrLen = (int)str.size() + 1;
+    int chStrLen = (int)str->size() + 1;
     for (int i = 0; i < test; ++i) {
         allPossibleMatches += samples->size(i) - chStrLen + 1;
     }
     for (int i = 0; i < charStrHits.size(); ++i){
         if (charStrHits.at(i) / allPossibleMatches >= pMin) {
-            queryStrs.push_back( ((char)i) + str );
+            vector<int>* newStr = new vector<int>();
+            newStr->push_back(i);
+            newStr->insert(newStr->end(), str->begin(), str->end());
+            queryStrs.push_back( newStr );
             
             vector<double>* prob = new vector<double>;  // make a copy to store in the vector
             prob->insert(prob->end(), nextSymProb->begin(), nextSymProb->end());
@@ -296,19 +306,19 @@ vector<double>* PSTBuilder::smooth(vector<double> *prob, double nsMinP){
 }
 
 PSTNodeInterface* PSTBuilder::createPSTRoot(vector<double>* nextSymProb){
-    return new DefaultPSTNode("", nextSymProb);
+    return new DefaultPSTNode(NULL, nextSymProb);
 }
 
-void PSTBuilder::addToTree(string str, vector<double> *strNSymProb, double nextSymProbMin) {
+void PSTBuilder::addToTree(vector<int>* str, vector<double> *strNSymProb, double nextSymProbMin) {
     PSTNodeInterface* deepestNode = pstRoot->get(str);
     
     if (!deepestNode)
         return;
     
-    if (deepestNode->getString().size() == str.size()-1) {
+    if (deepestNode->getIDString()->size() == str->size()-1) {
         vector<double>* prob = new vector<double>;
         prob->insert(prob->end(), strNSymProb->begin(), strNSymProb->end());  // make our own copy to store
-        deepestNode->insert(str[0], smooth(prob, nextSymProbMin));
+        deepestNode->insert(str->at(0), smooth(prob, nextSymProbMin));
     }
     else{
         vector<int> savedStrChHits, savedChStrHits;
@@ -319,12 +329,20 @@ void PSTBuilder::addToTree(string str, vector<double> *strNSymProb, double nextS
         //      System.arraycopy(charStrHits,0,savedChStrHits,0,charStrHits.length);
         //      System.arraycopy(strCharHits,0,savedStrChHits,0,strCharHits.length);
         
-        for (int i = (int)str.size() - (int)(deepestNode->getString().size()) - 1; i > -1; deepestNode = deepestNode->get(str[i]), --i) {
-            initHitCounts(str.substr(i,str.size()));    // get string from i to the end
+        for (int i = (int)str->size() - (int)(deepestNode->getIDString()->size()) - 1; i > -1; --i) {
+            int sym = str->at(i);
+            deepestNode = deepestNode->get(sym);
+            
+            if (deepestNode == NULL)
+                break;  // this should never happen...because children should have been added in order
+            vector<int> subStr;
+            subStr.assign(str->begin()+i, str->end());
+            initHitCounts(&subStr);    // get string from i to the end
+            
             vector<double> *prob = new vector<double>();
             prob = computeNextSymProb(prob);
             if (prob)
-                deepestNode->insert(str[i], smooth(prob, nextSymProbMin));
+                deepestNode->insert(str->at(i), smooth(prob, nextSymProbMin));
         }
         // delete prob; <-- do not delete! the vectors are used by 'deepestNode'!
         
@@ -337,7 +355,7 @@ void PSTBuilder::addToTree(string str, vector<double> *strNSymProb, double nextS
     }
 }
 
-void PSTBuilder::initHitCounts(string str){
+void PSTBuilder::initHitCounts(vector<int>* str){
     if (!samples)
         return; // error!
     //    Arrays.fill(strCharHits,0);
@@ -361,15 +379,15 @@ void PSTBuilder::initHitCounts(string str){
             isUpdatePerSample[i] = true;
         //      Arrays.fill(isUpdatePerSample, true); /*@ron 1/03*/
         int sampleSize = (int)samples->size(sampleID);
-        int loopTest = sampleSize - (int)str.size();
+        int loopTest = sampleSize - (int)str->size();
         int j;
 //        post("numOfSamples %d sample %d size %d loopTest %d sample %s", numOfSamples, sampleID, sampleSize, loopTest, str.c_str());
         for (int i = 0; i < loopTest; ++i) {
-            for (j = 0; j < str.size(); ++j) {
-                if (samples->get(sampleID, i+j) != str[j])
+            for (j = 0; j < str->size(); ++j) {
+                if (samples->get(sampleID, i+j) != str->at(j))
                     break;
             }
-            if (j == str.size()) {    /// we got to the end..
+            if (j == str->size()) {    /// we got to the end..
                 strHits++;
                 if (i+j < sampleSize) {
                     int charId = samples->get(sampleID, i+j);

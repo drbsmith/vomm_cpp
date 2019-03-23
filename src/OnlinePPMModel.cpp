@@ -19,9 +19,11 @@ OnlinePPMModel::~OnlinePPMModel() {
     // one of our buffers (==_buffer) will be deleted by base destructor.
     if (predictionBuffer && predictionBuffer != _buffer) {
         delete predictionBuffer;
+        predictionBuffer = NULL;
     }
     if (learningBuffer && learningBuffer != _buffer) {
         delete learningBuffer;
+        learningBuffer = NULL;
     }
 }
 

@@ -30,10 +30,11 @@ class PSTNodeInterface {
 public:
     virtual ~PSTNodeInterface() {}
     
-    virtual string getString()=0;
+    virtual vector<int>* getIDString()=0;
 
     virtual double predict(int ch)=0;
     virtual double predict(string ch)=0;
+    virtual double predict(vector<int>* seq)=0;
     virtual double predict(Byte b)=0;
     virtual double predict(vector<Byte>* bytes)=0;
 
@@ -41,7 +42,7 @@ public:
     * Assert param length is this.getAlphabetSizeI()
     * initializes pArr s.a. pArr[sym] = this node sym prediction
     */
-    virtual void predict(vector<double>* pArr)=0;
+    virtual vector<double>* predict()=0;
 
     /**
     * @returns PSTNodeInterface corresponds to the largest suffix of the string defined
@@ -49,10 +50,11 @@ public:
     */
     virtual PSTNodeInterface* get(vector<Byte>* byteSeq)=0;//descended
     virtual PSTNodeInterface* get(string seq)=0;//descended
+    virtual PSTNodeInterface* get(vector<int>* seq)=0;//descended
     virtual PSTNodeInterface* get(ContextIterator* contextIter)=0;//descended
-    virtual PSTNodeInterface* get(char symbol)=0;//child
+    virtual PSTNodeInterface* get(int symbol)=0;//child
 
-    virtual void insert(char symbol, vector<double>* nextSymProbability)=0;
+    virtual void insert(int symbol, vector<double>* nextSymProbability)=0;
 
     /**
     * @return this node sub tree height
@@ -60,6 +62,8 @@ public:
     virtual int subTreeHeight()=0;
 
     virtual int getAlphabetSize()=0;
+    
+    virtual string toString()=0;
 private:
     virtual PSTNodeInterface* get(vector<Byte> *bytes, int currentByteIndex)=0;
 //       PSTNodeInterface load(File source);

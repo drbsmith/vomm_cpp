@@ -5,21 +5,25 @@
 //  Created by Benjamin Smith on 6/1/18.
 //
 
+//#include <iostream>
 #include <stdio.h>
+#include <sstream>
 #include "../include/algs/PSTPredictor.hpp"
 
-#include "../include/algs/pst/PSTArithPredictor.hpp"
 #include "../include/algs/pst/PSTBuilder.hpp"
 #include "../include/util/SampleIterator2SamplesBridge.hpp"
 #include "../include/util/IntSampleIter.hpp"
 
 using namespace vmm_algs_pst;
 
-PSTPredictor::PSTPredictor() : pst(NULL) { }
+PSTPredictor::PSTPredictor() : pst(NULL), pstPredictor(NULL), trained(false) { }
 
 PSTPredictor::~PSTPredictor() {
     if (pst)
         delete pst;
+    
+    if (pstPredictor)
+        delete pstPredictor;
 }
 
 /**
@@ -39,6 +43,8 @@ void PSTPredictor::init(int _abSize, double _pMin, double _alpha, double _gamma,
     gamma = _gamma;
     r = _r;
     vmmOrder = _vmmOrder;
+    
+    // puts it in a limbo state if we've already 'learned'...
 }
 
 void PSTPredictor::learn(vector<int>* trainingSequence) {
@@ -49,29 +55,44 @@ void PSTPredictor::learn(vector<int>* trainingSequence) {
     
     samples->init(&ssi);
 
+    if (pst)
+        delete pst;
+    
     pst = builder.build(samples, pMin, alpha, gamma, r, vmmOrder);
     
     string tree = ((DefaultPSTNode*)pst)->toString();
+    
+    if (pstPredictor)
+        delete pstPredictor;
+    
+    pstPredictor = new PSTArithPredictor(pst);
+    
+    trained = true;
 }
 
 double PSTPredictor::predict(int symbol, vector<int>* context) {
-    if (symbol >= abSize)
+    if (symbol >= abSize || !trained)
         return -1;
     
     try {
-        vector<double> pArr(abSize); // = new double[abSize];
+        vector<double>* pArr = NULL; // = new double[abSize];
         
-        PSTArithPredictor pstPredictor(pst);
+//        if (pstPredictor)
+//            delete pstPredictor;
+//        pstPredictor = new PSTArithPredictor(pst);
+//        PSTArithPredictor pstPredictor(pst);  <-- now retained at the class level
         
         for (int i = 0, sym = -1; i < context->size(); ++i) {
             sym = (int) context->at(i);
             if (sym < abSize) {
-                pstPredictor.predict(&pArr);
-                pstPredictor.increment(sym);
+                pArr = pstPredictor->predict();
+                pstPredictor->increment(sym);
             }
         }
-        pstPredictor.predict(&pArr);
-        return pArr.at(symbol);
+        pArr = pstPredictor->predict();
+        if (pArr)
+            return pArr->at(symbol);
+        else return -1;
     }
     catch (exception npe) { //NullPointerException npe) {
         if (pst == NULL) {
@@ -84,8 +105,10 @@ double PSTPredictor::predict(int symbol, vector<int>* context) {
     return -1;
 }
 double* PSTPredictor::predictAll(vector<int>* context) {
-    double* out = new double[abSize];
+    if (!trained)
+        return NULL;
     
+    double* out = new double[abSize];
     
     for (int j = 0; j < abSize; j++) {
         out[j] = predict(j, context);
@@ -99,25 +122,32 @@ double PSTPredictor::logEval(vector<int>* testSequence) {
 
 double PSTPredictor::logEval(vector<int>* testSequence, vector<int>* initialContext) {
     try {
-        vector<double> pArr(abSize); // = new double[abSize];
+        if (!trained)
+            return NULL;
+        
+        vector<double>* pArr = NULL; // = new double[abSize];
         double eval = 0.0;
         
-        PSTArithPredictor pstPredictor(pst);
+//        if (pstPredictor)
+//            delete pstPredictor;
+//        pstPredictor = new PSTArithPredictor(pst);
+ //       PSTArithPredictor pstPredictor(pst); // <-- now retained at class level
         
         if (initialContext != NULL) {
             for (int i = 0, sym = -1; i < initialContext->size(); ++i) {
                 sym = (int) initialContext->at(i);
                 if (sym < abSize)
-                    pstPredictor.increment(sym);
+                    pstPredictor->increment(sym);
             }
         }
         
         for (int i = 0, sym = -1; i < testSequence->size(); ++i) {
             sym = (int) testSequence->at(i);
             if (sym < abSize) {
-                pstPredictor.predict(&pArr);
-                eval += log(pArr.at(sym));
-                pstPredictor.increment(sym);
+                pArr = pstPredictor->predict();
+                if (pArr)
+                    eval += log(pArr->at(sym));
+                pstPredictor->increment(sym);
             }
         }
         
@@ -133,4 +163,48 @@ double PSTPredictor::logEval(vector<int>* testSequence, vector<int>* initialCont
     }
     
     return -1;
+}
+
+string PSTPredictor::ModelToString() {
+    stringstream ss;
+    
+    ss << "<PST_VMM>" << abSize << " " << pMin << " " << alpha << " " << gamma << " " << r << " " << vmmOrder << "<TREE>";
+    
+    ss << pst->toString();
+    
+    ss << "</TREE></PST_VMM>" << endl;
+    
+    return ss.str();
+}
+
+void PSTPredictor::ModelFromString(string data) {
+    string::size_type pos = data.find("<PST_VMM>");
+    data = data.substr(pos + 9);
+    
+    try {
+        abSize = stoi(data,&pos);
+        data = data.substr(pos+1);
+        pMin = stod(data,&pos);
+        data = data.substr(pos+1);
+        alpha = stod(data,&pos);
+        data = data.substr(pos+1);
+        gamma = stod(data,&pos);
+        data = data.substr(pos+1);
+        r = stod(data,&pos);
+        data = data.substr(pos+1);
+        vmmOrder = stoi(data,&pos);
+        data = data.substr(pos+1);
+    } catch (invalid_argument) {}   // just leave it at default if the data is corrupt
+    
+    pos = data.find("<TREE>");
+    data = data.substr(pos+6);
+    
+    if (data.size() > 0)
+        pst = DefaultPSTNode::FromString(data);
+    
+    if (pst) {   // should check integrity better, but GIGO is on the user right now
+        trained = true;
+    
+        pstPredictor = new PSTArithPredictor(pst);
+    }
 }

@@ -75,6 +75,10 @@ namespace vmm_algs_decomp {
         
         double logEval(vector<int>* testSequence, vector<int>* initialContext);
 
+        /**
+         * PredictAll
+         * Caller MUST delete the returned array of double
+         */
         double* predictAll(vector<int>* context);
         
         string ModelToString();

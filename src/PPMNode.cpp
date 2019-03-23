@@ -46,6 +46,16 @@ PPMNode::PPMNode(string data) : _firstChild(NULL), _nextSibling(NULL) {
         }
     }
 }
+PPMNode::~PPMNode() {
+    if (_firstChild)
+        delete _firstChild;
+    _firstChild = NULL;
+    if (_nextSibling)
+        delete _nextSibling;
+    _nextSibling = NULL;
+    // don't delete parent, parent should have called us
+    _parent = NULL;
+}
 
 PPMNode* PPMNode::GetFirstChild() {
     return _firstChild;
@@ -376,14 +386,16 @@ PPMNode* PPMNode::FromString(std::string data) {
                 if ((*it)[0] == '[') { // it's a child
                     (*it).erase((*it).begin());
                     PPMNode* child = new PPMNode(*it);
-                    active->SetFirstChild(child);
+                    if (active)
+                        active->SetFirstChild(child);
                     child->SetParent(active);
                     
                     active = child;
                 } else if ((*it)[0] == '{') { // it's a sibling
                     (*it).erase((*it).begin());
                     PPMNode* sibling = new PPMNode(*it);
-                    active->SetNextSibling(sibling);
+                    if (active)
+                        active->SetNextSibling(sibling);
                     sibling->SetParent(active);
                     
                     active = sibling;

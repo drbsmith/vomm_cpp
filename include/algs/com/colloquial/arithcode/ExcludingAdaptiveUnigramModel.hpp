@@ -33,10 +33,9 @@ private:
     /** Construct an excluding adaptive unigram model.
      */
 public:
-    ExcludingAdaptiveUnigramModel(int alphabetSize) {
+    ExcludingAdaptiveUnigramModel(int alphabetSize) : eofIndex(alphabetSize) {
       /*@ron add on */
       abSize = alphabetSize+1;
-      eofIndex = alphabetSize;
       _count = new int[abSize];/*@ron from 257 to abSize*/
 
         for (int i = 0; i < abSize; i++)

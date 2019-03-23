@@ -177,7 +177,9 @@ StaticDecompositionNode* DecompositionTreeBuilder::buildStatic(SampleIterator* s
 
             if (superSym < it->first) { //superSym.compareTo(lowCount.lastKey()) < 0) {
                 superSym = it->first; // (Integer)lowCount.lastKey();
-                swap(node2, node1);
+                AbsBinaryDNode* tmp = node1;
+                node1 = node2; node2 = tmp;
+//                swap(node2, node1);
             }
 
             lowCount->erase(it); //lowCount.remove(lowCount.lastKey());
@@ -232,8 +234,8 @@ TreeMap* DecompositionTreeBuilder::calculateAbCount(SampleIterator* sample){
 }
 
 
-void DecompositionTreeBuilder::swap(AbsBinaryDNode* n1, AbsBinaryDNode* n2) {
-    AbsBinaryDNode* tmp = n1;
-    n1 = n2;
-    n2 = tmp;
-}
+//void DecompositionTreeBuilder::swap(AbsBinaryDNode* n1, AbsBinaryDNode* n2) {
+//    AbsBinaryDNode* tmp = n1;
+//    n1 = n2;
+//    n2 = tmp;
+//}

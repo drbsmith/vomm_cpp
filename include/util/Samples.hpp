@@ -48,7 +48,9 @@ public:
     Samples() {
         //samples = new FileChannel[0];
     }
-    virtual ~Samples() { }
+    virtual ~Samples() {
+        samples.clear();
+    }
 
     void init(string _samplesPath){
       samplesPath = _samplesPath;

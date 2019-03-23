@@ -70,7 +70,7 @@ namespace vmm_algs_decomp {
   /*****/
         TreeMap* calculateAbCount(SampleIterator* sample);
 
-        void swap(AbsBinaryDNode* n1, AbsBinaryDNode* n2);
+//        void swap(AbsBinaryDNode* n1, AbsBinaryDNode* n2);
 
 };
 }   // namespace
