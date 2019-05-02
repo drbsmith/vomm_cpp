@@ -7,19 +7,22 @@
 //
 
 // defines to test each of the vomm algorithms
-#define TEST_PST
+//#define TEST_PST
 //#define TEST_BIN
-//#define TEST_DCTW
+#define TEST_DCTW
 //#define TEST_PPMC
 //#define TEST_LZMS
 
 #define TEST_SERIALIZATION
 
 #define ALPHA_SIZE 256
-//#define TRAINING_SIZE 1000
+//#define TRAINING_SIZE 5000
+#define USE_MIDI
 
 #include <iostream>
 #include <vector>
+
+#include "../../../midifile/include/MidiFile.h"
 
 #include "../../include/algs/PSTPredictor.hpp"
 #include "../../include/algs/BinaryCTWPredictor.hpp"
@@ -38,22 +41,48 @@ using namespace std;
 int main(int argc, const char * argv[]) {
     vector<int> dataVec;
     double* prob;
+    
+#ifdef USE_MIDI
+    MidiFile midifile("/Users/smith/Box Sync/Code/vomm_cpp/src/01Prelude.mid");
+    midifile.absoluteTime();
+    midifile.joinTracks();
+    
+    for (int i=0; i<midifile.getNumEvents(0); i++) {
+        int command = midifile.getEvent(0, i).data[0] & 0xf0;
+        if (command == 0x90 && midifile.getEvent(0, i).data[2] != 0) {
+            // store note-on velocity and time
+            int pitch = midifile.getEvent(0, i).data[1];
+            dataVec.push_back(pitch);
+        }
+    }
+    cout << "midi notes:" << dataVec.size() << endl;
+#else
 #ifdef TRAINING_SIZE
-    for (int i = 0; i < TRAINING_SIZE; i++)
-        dataVec.push_back(rand() % ALPHA_SIZE);
+    int r = 64;
+    for (int i = 0; i < TRAINING_SIZE; i++) {
+        r += (rand() % 25) - 12;
+        r = (r < 0 ? ALPHA_SIZE-1 : r);
+        dataVec.push_back(r % ALPHA_SIZE);
+    }
 #else
     int data[] = {97, 98, 114, 97, 99, 97, 100, 97, 98, 114, 97}; // same as seq = "abracadabra"
     string test = "abracadabra"; // "The quick brown fox jumped over the lazy dog.";
     for (int i = 0; i < test.size(); i++)
         dataVec.push_back(test[i]);
 #endif
+#endif
     
 #ifdef TEST_PST
     cout << "PST: " << endl;
-    PSTPredictor* pst = new PSTPredictor();;
-    
-    pst->init(ALPHA_SIZE, 0.001, 0.0, 0.0001, 1.05, 20);
-    pst->learn(&dataVec);
+    PSTPredictor* pst = NULL;
+    for (int i = 0; i < 100; i++) {
+        if (pst != NULL)
+            delete pst;
+        pst = new PSTPredictor();;
+        
+        pst->init(ALPHA_SIZE, 0.001, 0.0, 0.0001, 1.05, 20);
+        pst->learn(&dataVec);
+    }
     
     cout << "logeval : " << pst->logEval("cadabra") << endl;
     cout << "P(c|abra) : " << pst->predict('c', "abra") << endl;
@@ -71,11 +100,13 @@ int main(int argc, const char * argv[]) {
 #ifdef TEST_SERIALIZATION
     string pstModel = pst->ModelToString();
     pstModel = pstModel.substr(0, pstModel.size()-50);
-    cout << pstModel << endl;
+//    cout << pstModel << endl;
     
-    delete pst;
-    pst = new PSTPredictor();
-    pst->ModelFromString(pstModel);
+    for (int i = 0; i < 100; i++) {
+        delete pst;
+        pst = new PSTPredictor();
+        pst->ModelFromString(pstModel);
+    }
     
 //    pstModel = pst.ModelToString();
 //    cout << pstModel << endl;
@@ -110,33 +141,44 @@ int main(int argc, const char * argv[]) {
 #endif
 #ifdef TEST_DCTW
     cout << "DCTW:" << endl;
-    DCTWPredictor dctw;
+    DCTWPredictor* dctw = NULL;
+    for (int i = 0; i < 100; i++) {
+        if (dctw)
+            delete dctw;
+        dctw = new DCTWPredictor();
+        
+        dctw->init(ALPHA_SIZE, 5);
+        dctw->learn(&dataVec); //"abracadabra");
+    }
+//    dctw->learn("the quick brown fox jumped over the lazy dog.");
     
-    dctw.init(ALPHA_SIZE, 5);
-    dctw.learn(&dataVec); //"abracadabra");
-//    dctw.learn("the quick brown fox jumped over the lazy dog.");
+    cout << "logeval : " << dctw->logEval("cadabra") << endl;
+    cout << "P(c|abra) : " << dctw->predict('c', "abra") << endl;
     
-    cout << "logeval : " << dctw.logEval("cadabra") << endl;
-    cout << "P(c|abra) : " << dctw.predict('c', "abra") << endl;
+    cout << "P(c|dab) : " << dctw->predict('c', "dab") << endl;
+    cout << "P(c|ra) : " << dctw->predict('c', "ra") << endl;
+    cout << "P(c|bra) : " << dctw->predict('c', "bra") << endl;
+    cout << "P(c|abcd) : " << dctw->predict('c', "abcd") << endl;
+    cout << "P(d|ra) : " << dctw->predict('d', "ra") << endl << endl;
     
-    cout << "P(c|dab) : " << dctw.predict('c', "dab") << endl;
-    cout << "P(c|ra) : " << dctw.predict('c', "ra") << endl;
-    cout << "P(c|bra) : " << dctw.predict('c', "bra") << endl;
-    cout << "P(c|abcd) : " << dctw.predict('c', "abcd") << endl;
-    cout << "P(d|ra) : " << dctw.predict('d', "ra") << endl << endl;
+//    cout << "P(z|the la) : " << dctw->predict('z', "the la") << endl;
+//    cout << "P(y|the la) : " << dctw->predict('y', "the la") << endl;
+//    cout << "P( |the la) : " << dctw->predict(' ', "the la") << endl;
     
-//    cout << "P(z|the la) : " << dctw.predict('z', "the la") << endl;
-//    cout << "P(y|the la) : " << dctw.predict('y', "the la") << endl;
-//    cout << "P( |the la) : " << dctw.predict(' ', "the la") << endl;
-    
-//    cout << dctw.ModelToString() << endl; // this is not finished, for serializing and deserializing. It's a complex tree with lots of nodes!
+    delete dctw;
+//    cout << dctw->ModelToString() << endl; // this is not finished, for serializing and deserializing. It's a complex tree with lots of nodes!
 #endif
 #ifdef TEST_PPMC
     cout << "PPMC:" << endl;
-    PPMCPredictor* ppmc = new PPMCPredictor();
-    ppmc->init(ALPHA_SIZE, 5);
-    
-    ppmc->learn(&dataVec);
+    PPMCPredictor* ppmc = NULL;
+    for (int i = 0; i < 100; i++) {
+        if (ppmc)
+            delete ppmc;
+        ppmc = new PPMCPredictor();
+        ppmc->init(ALPHA_SIZE, 5);
+        
+        ppmc->learn(&dataVec);
+    }
     
     cout << "logeval : " << ppmc->logEval("cadabra") << endl;
 //    cout << "logeval : " << ppmc.logEval("cadabra") << endl;
@@ -156,11 +198,13 @@ int main(int argc, const char * argv[]) {
 #ifdef TEST_SERIALIZATION
     string model = ppmc->ModelToString();    // get the model encoded as an ascii string
     
-    delete ppmc;
-    ppmc = new PPMCPredictor();
-    
-    ppmc->init(ALPHA_SIZE,5);
-    ppmc->ModelFromString(model);    // reconstitute the model from the ascii string!
+    for (int i = 0; i < 100; i++) {
+        delete ppmc;
+        ppmc = new PPMCPredictor();
+        
+        ppmc->init(ALPHA_SIZE,5);
+        ppmc->ModelFromString(model);    // reconstitute the model from the ascii string!
+    }
     
     // Could also feed the model in 1 line at a time:
 //    ppmc.ModelFromString("n 97|1|3 [100|1|1 [97|1|1 [98|1|1 [114|1|1 [97|1|0]]]] {99|1|1 [97|1|1 [100|1|1 [97|1|1 [98|1|0]]]] {98|5|1 [114|4|1 [97|3|1 [99|2|1 [97|1|0]]]]}}]");

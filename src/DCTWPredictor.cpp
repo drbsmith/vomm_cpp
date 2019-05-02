@@ -123,6 +123,7 @@ double* DCTWPredictor::predictAll(vector<int>* context) {
     for (int j = 0; j < abSize; j++) {
         out[j] = dctw->predict(j, ctwContext);
     }
+    delete ctwContext;
     return out;
 }
 
@@ -149,6 +150,7 @@ double DCTWPredictor::logEval(vector<int>* testSequence, vector<int>* initialCon
             }
         }
         
+        delete context;
         return eval * NEGTIVE_INVERSE_LOG_2;
     }
     catch (exception ex) { //} (NullPointerException npe) {

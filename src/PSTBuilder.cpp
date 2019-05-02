@@ -6,6 +6,7 @@
 //
 
 #include <stdio.h>
+#include <algorithm>
 #include "../include/algs/pst/PSTBuilder.hpp"
 
 using namespace vmm_algs_pst;
@@ -40,7 +41,7 @@ PSTBuilder::~PSTBuilder() {
     
     for (int i = 0; i < suffStrNextSymProb.size(); i++)
         if (suffStrNextSymProb.at(i) != NULL) {
-            delete suffStrNextSymProb.at(i);    //TODO: because the same vector is added many times it can't be deleted...something must be wrong there!
+            delete suffStrNextSymProb.at(i);
         }
     for (int i = 0; i < queryStrs.size(); i++)
         if (queryStrs.at(i) != NULL)
@@ -72,6 +73,9 @@ PSTNodeInterface* PSTBuilder::build(Samples* _samples, double pMin, double alpha
         if (str->size() < strMaxLength)
             updateQueryStrs(str, &strNSymProb, pMin);
         
+        delete *queryStrs.begin();
+        delete *suffStrNextSymProb.begin();
+        
         queryStrs.erase(queryStrs.begin()); //0);
         suffStrNextSymProb.erase(suffStrNextSymProb.begin()); //.remove(0);
     }
@@ -82,13 +86,6 @@ PSTNodeInterface* PSTBuilder::build(Samples* _samples, double pMin, double alpha
 /** @ron 1/03
  * Golan's PST version.
  *
- * @param samples
- * @param pMin
- * @param alpha
- * @param nextSymProbMin
- * @param addedValThreshold
- * @param strMaxLength
- * @return
  */
 PSTNodeInterface* PSTBuilder::buildGolanPST(Samples* _samples, int nMin, int minNumHits,
                                 double nextSymProbMin, double r, int strMaxLength){
@@ -112,6 +109,9 @@ PSTNodeInterface* PSTBuilder::buildGolanPST(Samples* _samples, int nMin, int min
         }
         if (str->size() < strMaxLength)
             updateQueryStrsGolan(str, &strNSymProb, nMin);
+        
+        delete *queryStrs.begin();
+        delete *suffStrNextSymProb.begin();
         
         queryStrs.erase(queryStrs.begin()); //0);
         suffStrNextSymProb.erase(suffStrNextSymProb.begin()); //.remove(0);
@@ -155,7 +155,7 @@ void PSTBuilder::init(double pMin, double nextSymProbMin){
     for (int i = 0; i < alphabetSize; ++i) {
         prob->at(i) = (double)strCharHits[i]/(double)allLength;
         if (prob->at(i) > pMin) {
-            str = new vector<int>();
+            str = new vector<int>;
             str->push_back(i);
             queryStrs.push_back(str); //(char)i);
 //            suffStrNextSymProb.push_back(prob); // TODO: something funny here. The same vector gets added over and over, and gets changed in the loop. Would it make a copy in Java, so it's adding versions of the array? Or else why is the same thing added over and over?
@@ -163,7 +163,7 @@ void PSTBuilder::init(double pMin, double nextSymProbMin){
     }
     for (int i = 0; i < queryStrs.size(); i++) {
         vector<double> *p = new vector<double>;
-        p->insert(p->end(), prob->begin(), prob->end());
+        p->assign(prob->begin(), prob->end());
         suffStrNextSymProb.push_back(p);
     }
     
@@ -288,8 +288,8 @@ void PSTBuilder::updateQueryStrs(vector<int>* str, vector<double>* nextSymProb, 
             newStr->insert(newStr->end(), str->begin(), str->end());
             queryStrs.push_back( newStr );
             
-            vector<double>* prob = new vector<double>;  // make a copy to store in the vector
-            prob->insert(prob->end(), nextSymProb->begin(), nextSymProb->end());
+            vector<double>* prob = new vector<double>();  // make a copy to store in the vector
+            prob->assign(nextSymProb->begin(), nextSymProb->end());
             suffStrNextSymProb.push_back(prob);
         }
     }
@@ -319,15 +319,12 @@ void PSTBuilder::addToTree(vector<int>* str, vector<double> *strNSymProb, double
         vector<double>* prob = new vector<double>;
         prob->insert(prob->end(), strNSymProb->begin(), strNSymProb->end());  // make our own copy to store
         deepestNode->insert(str->at(0), smooth(prob, nextSymProbMin));
+        // do not delete 'prob', deepestNode keeps a pointer to it
     }
     else{
         vector<int> savedStrChHits, savedChStrHits;
         savedStrChHits.insert(savedStrChHits.end(), charStrHits.begin(), charStrHits.end());
         savedChStrHits.insert(savedChStrHits.end(), strCharHits.begin(), strCharHits.end());
-        //        int *savedStrChHits = new int[strCharHits.length];
-        //        int *savedChStrHits = new int[charStrHits.length];
-        //      System.arraycopy(charStrHits,0,savedChStrHits,0,charStrHits.length);
-        //      System.arraycopy(strCharHits,0,savedStrChHits,0,strCharHits.length);
         
         for (int i = (int)str->size() - (int)(deepestNode->getIDString()->size()) - 1; i > -1; --i) {
             int sym = str->at(i);
@@ -339,10 +336,9 @@ void PSTBuilder::addToTree(vector<int>* str, vector<double> *strNSymProb, double
             subStr.assign(str->begin()+i, str->end());
             initHitCounts(&subStr);    // get string from i to the end
             
-            vector<double> *prob = new vector<double>();
-            prob = computeNextSymProb(prob);
-            if (prob)
-                deepestNode->insert(str->at(i), smooth(prob, nextSymProbMin));
+            vector<double>* prob = new vector<double>();
+            computeNextSymProb(prob);
+            deepestNode->insert(str->at(i), smooth(prob, nextSymProbMin));
         }
         // delete prob; <-- do not delete! the vectors are used by 'deepestNode'!
         
@@ -350,8 +346,6 @@ void PSTBuilder::addToTree(vector<int>* str, vector<double> *strNSymProb, double
         charStrHits.insert(charStrHits.end(), savedChStrHits.begin(), savedChStrHits.end());
         strCharHits.clear();
         strCharHits.insert(strCharHits.end(), savedStrChHits.begin(), savedStrChHits.end());
-        //          System.arraycopy(savedChStrHits,0,charStrHits,0,charStrHits.length);    // restoring saved hits
-        //          System.arraycopy(savedStrChHits,0,strCharHits,0,strCharHits.length);
     }
 }
 
@@ -360,14 +354,18 @@ void PSTBuilder::initHitCounts(vector<int>* str){
         return; // error!
     //    Arrays.fill(strCharHits,0);
     //    Arrays.fill(charStrHits,0);
-    for (int i = 0; i < strCharHits.size(); i++) {
-        strCharHits[i] = 0;
-        charStrHits[i] = 0;   // these 2 vectors must be the same size, always
-    }
+    
+    std::fill(strCharHits.begin(), strCharHits.end(), 0);
+    std::fill(charStrHits.begin(), charStrHits.end(), 0);
+//    for (int i = 0; i < strCharHits.size(); i++) {
+//        strCharHits[i] = 0;
+//        charStrHits[i] = 0;   // these 2 vectors must be the same size, always
+//    }
     strHits = 0;
     
-    for (int i = 0; i < charStrHitsPerSample.size(); i++)
-        charStrHitsPerSample[i] = 0;
+    std::fill(charStrHitsPerSample.begin(), charStrHitsPerSample.end(), 0);
+//    for (int i = 0; i < charStrHitsPerSample.size(); i++)
+//        charStrHitsPerSample[i] = 0;
     //    Arrays.fill(charStrHitsPerSample, 0);
     vector<bool> isUpdatePerSample(charStrHitsPerSample.size(), 0);
     //    bool isUpdatePerSample[] = new bool[charStrHitsPerSample.length];
@@ -384,7 +382,7 @@ void PSTBuilder::initHitCounts(vector<int>* str){
 //        post("numOfSamples %d sample %d size %d loopTest %d sample %s", numOfSamples, sampleID, sampleSize, loopTest, str.c_str());
         for (int i = 0; i < loopTest; ++i) {
             for (j = 0; j < str->size(); ++j) {
-                if (samples->get(sampleID, i+j) != str->at(j))
+                if (samples->get(0, i+j) != str->at(j)) // get sampleID, not used. just 0
                     break;
             }
             if (j == str->size()) {    /// we got to the end..
@@ -414,16 +412,18 @@ void PSTBuilder::initHitCounts(vector<int>* str){
 // Assigns retVal, caller must delete it!
 vector<double>* PSTBuilder::computeNextSymProb(vector<double>* retVal) {
     if (strCharHits.size() < 1 || !retVal)
-        return NULL;
+        return retVal;
     
-    retVal->resize(strCharHits.size()); // make sure we have enough entries, don't need to clear
+//    retVal->resize(strCharHits.size()); // make sure we have enough entries, don't need to clear
     
     double strCharAll = 0; // get total hits in our vector
     for (int i=0; i < strCharHits.size(); ++i) {
         strCharAll += strCharHits.at(i);
     }
-    for (int i = 0; i < retVal->size(); ++i) {
-        retVal->at(i) = (double)(strCharHits[i]/strCharAll);
+    
+    retVal->clear();
+    for (int i = 0; i < strCharHits.size(); ++i) {
+        retVal->push_back(strCharHits.at(i)/strCharAll);
     }
     return retVal;
 }

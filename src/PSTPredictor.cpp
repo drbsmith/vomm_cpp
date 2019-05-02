@@ -16,7 +16,7 @@
 
 using namespace vmm_algs_pst;
 
-PSTPredictor::PSTPredictor() : pst(NULL), pstPredictor(NULL), trained(false) { }
+PSTPredictor::PSTPredictor() : pst(NULL), trained(false), pstPredictor(NULL)  { }
 
 PSTPredictor::~PSTPredictor() {
     if (pst)
@@ -60,7 +60,7 @@ void PSTPredictor::learn(vector<int>* trainingSequence) {
     
     pst = builder.build(samples, pMin, alpha, gamma, r, vmmOrder);
     
-    string tree = ((DefaultPSTNode*)pst)->toString();
+//    string tree = ((DefaultPSTNode*)pst)->toString();
     
     if (pstPredictor)
         delete pstPredictor;
@@ -85,7 +85,8 @@ double PSTPredictor::predict(int symbol, vector<int>* context) {
         for (int i = 0, sym = -1; i < context->size(); ++i) {
             sym = (int) context->at(i);
             if (sym < abSize) {
-                pArr = pstPredictor->predict();
+//                pArr =
+                pstPredictor->predict();
                 pstPredictor->increment(sym);
             }
         }

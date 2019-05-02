@@ -53,7 +53,7 @@ private:
     const static string XML_PROB_CDATA_ET, XML_CHILDREN_ST, XML_CHILDREN_ET;
 
     const static int ABSIZE = 256;  // default if not supplied
-public:
+
     // BDS: Do these properties need to be public? Not very safe...
     vector<int> idStr;
     vector<double> *nextSymProbability;/*ZZZ*/
@@ -62,7 +62,8 @@ public:
     bool isLeaf;/*ZZZ*/
 
     int absize;
-
+    
+public:
     DefaultPSTNode();
 
     DefaultPSTNode(int alphabetSize);

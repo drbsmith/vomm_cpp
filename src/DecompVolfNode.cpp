@@ -114,11 +114,13 @@ DecompVolfNode* DecompVolfNode::fromString(std::string data) {
                     DecompVolfNode* child = new DecompVolfNode(*it);
                     if (ret)    // should always be set already.
                         ret->AddChild(child);
+                    else
+                        delete child;
                     
-                    active = child;
+//                    active = child;
                 }  else {    // it's the first node
                     ret = new DecompVolfNode(*it);   // create the root
-                    active = ret;
+//                    active = ret;
                 }
             }
         }

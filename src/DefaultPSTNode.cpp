@@ -102,7 +102,7 @@ vector<double>* DefaultPSTNode::predict(){
     if (!nextSymProbability)
         return NULL;
     
-    return new vector<double>(*nextSymProbability);
+    return nextSymProbability; // new vector<double>(*nextSymProbability);
 //    pArr->clear();
 //    pArr->assign(nextSymProbability->begin(), nextSymProbability->end());
 //    pArr->insert(pArr->end(), nextSymProbability->begin(), nextSymProbability->end());
@@ -236,8 +236,10 @@ void DefaultPSTNode::insert(int symbol, vector<double>* nextSymProbability){
     newIDStr.push_back(symbol);
     newIDStr.insert(newIDStr.end(), idStr.begin(), idStr.end());
     DefaultPSTNode* newNode = new DefaultPSTNode(&newIDStr, nextSymProbability);
-    if (children)   // should never be NULL, but for safety
+    if (children != NULL)   // should never be NULL, but for safety
         children->insert(PSTNode(symbol, newNode));
+    else
+        delete newNode;
 //    children->at(symbol) = newNode;
 }
 /**
@@ -430,7 +432,7 @@ string DefaultPSTNode::GetOneNode(string data) {  // parse one node's worth of d
     
     int nested = 1; // how many levels in we are
     
-    string::size_type close, open;
+    string::size_type close = 0, open = 0;
     while (nested > 0 && index <= data.size()) {
         close = data.find(XML_NODE_ET, index);  // find next instance of open/close tags
         open = data.find(XML_NODE_ST, index);

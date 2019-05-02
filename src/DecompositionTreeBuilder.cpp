@@ -206,9 +206,10 @@ StaticDecompositionNode* DecompositionTreeBuilder::buildStatic(SampleIterator* s
  *      must return a sorted map. In c++ the map is always ascending by Key.
  */
 TreeMap* DecompositionTreeBuilder::calculateAbCount(SampleIterator* sample){
-    int *countArr = new int[absize];
-    for (int i = 0; i < absize; i++)
-        countArr[i] = 0;
+    vector<int> countArr(absize, 0);
+//    int *countArr = new int[absize];
+//    for (int i = 0; i < absize; i++)
+//        countArr[i] = 0;
     
     while (sample->hasNext()) {
         countArr[sample->next()]++;
@@ -228,7 +229,7 @@ TreeMap* DecompositionTreeBuilder::calculateAbCount(SampleIterator* sample){
 //            ((TreeMap)countMap.get(count)).put(sym, new BinDLeaf(sym.intValue(), absize));
     }
     
-    delete[] countArr;
+//    delete[] countArr;
 
     return countMap;
 }

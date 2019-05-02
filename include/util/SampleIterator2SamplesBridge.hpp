@@ -74,12 +74,11 @@ class SampleIterator2SamplesBridge : public Samples {
        * discarding sampleIndex
        * @param sampleIndex not relevant
        * @param index within this SampleIterator2SamplesBridge
-       * @return sym as byte
-       * @todo change byte to int!!
+       * @return sym
        */
       virtual int get(int sampleIndex, int index) override {
           if (index < symList.size())
-              return (Byte)symList.at(index);
+              return symList.at(index);
           else
               return 0;
       }

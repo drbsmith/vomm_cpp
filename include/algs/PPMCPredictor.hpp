@@ -71,7 +71,6 @@ namespace vmm_algs_ppmc {
         
         /** Learn: use an array of integers to train the model
          * @param trainingSequence the array of integers to use for training
-         * @param seqLength the length of the array in integers
          */
         void learn(vector<int>* trainingSequence);
         
