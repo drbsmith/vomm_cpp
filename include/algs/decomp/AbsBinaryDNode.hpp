@@ -87,7 +87,7 @@ namespace vmm_algs_decomp {
         
         AbsBinaryDNode(int abSize, AbsBinaryDNode* rightChild, AbsBinaryDNode* leftChild, int softModelDepth);
 
-        virtual double predict(int symbol, Context* context)=0; // 
+        virtual double predict(int symbol, Context* context)=0; //
 
         BitSet* getDescendants();
 //  int hashCode(){

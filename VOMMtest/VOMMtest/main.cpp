@@ -7,11 +7,11 @@
 //
 
 // defines to test each of the vomm algorithms
-//#define TEST_PST
-//#define TEST_BIN
+#define TEST_PST
+#define TEST_BIN
 #define TEST_DCTW
-//#define TEST_PPMC
-//#define TEST_LZMS
+#define TEST_PPMC
+#define TEST_LZMS
 
 #define TEST_SERIALIZATION
 
@@ -22,7 +22,7 @@
 #include <iostream>
 #include <vector>
 
-#include "../../../midifile/include/MidiFile.h"
+#include "/Users/smith/Box Sync/Code/midifile/include/MidiFile.h"
 
 #include "../../include/algs/PSTPredictor.hpp"
 #include "../../include/algs/BinaryCTWPredictor.hpp"
@@ -43,7 +43,7 @@ int main(int argc, const char * argv[]) {
     double* prob;
     
 #ifdef USE_MIDI
-    MidiFile midifile("/Users/smith/Box Sync/Code/vomm_cpp/src/01Prelude.mid");
+    MidiFile midifile("/Users/smith/Developer/vomm_cpp/01Prelude.mid");
     midifile.absoluteTime();
     midifile.joinTracks();
     
@@ -164,6 +164,10 @@ int main(int argc, const char * argv[]) {
 //    cout << "P(z|the la) : " << dctw->predict('z', "the la") << endl;
 //    cout << "P(y|the la) : " << dctw->predict('y', "the la") << endl;
 //    cout << "P( |the la) : " << dctw->predict(' ', "the la") << endl;
+    for (int i = 0; i < 1000; i++)
+        prob = dctw->predictAll("abrac");
+    cout << "P(all) : " << prob[99] << endl << endl;
+    delete prob;
     
     delete dctw;
 //    cout << dctw->ModelToString() << endl; // this is not finished, for serializing and deserializing. It's a complex tree with lots of nodes!
@@ -190,10 +194,10 @@ int main(int argc, const char * argv[]) {
     cout << "P(c|abcd) : " << ppmc->predict('c', "abcd") << endl;
     cout << "P(d|ra) : " << ppmc->predict('d', "ra") << endl << endl;
     
-//    for (int i = 0; i < 1000; i++)
-//        prob = pst.predictAll("abrac");
-//    cout << "P(all) : " << prob[96] << endl;
-//    delete prob;
+    for (int i = 0; i < 1000; i++)
+        prob = ppmc->predictAll("abrac");
+    cout << "P(all) : " << prob[96] << endl;
+    delete prob;
     
 #ifdef TEST_SERIALIZATION
     string model = ppmc->ModelToString();    // get the model encoded as an ascii string
