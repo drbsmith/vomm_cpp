@@ -73,7 +73,7 @@ double LZmsTree::getProbablityOfSequence(std::vector<int>* sequence) {
     
     double result = 0; // Will hold the probability. Initialized to log(1).
     LZNode* currentNode = root;
-    LZNode *child; //, *temp = NULL;
+    LZNode *child = NULL; //, *temp = NULL;
     
     for (int i = 0; i < sequence->size(); i++) {
         if (currentNode == NULL) {

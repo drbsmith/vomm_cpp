@@ -18,8 +18,9 @@ DCTWPredictor::DCTWPredictor() : dctw(NULL), trainingContext(NULL) {
 }
 
 DCTWPredictor::~DCTWPredictor() {
-    if (dctw)
-        delete dctw;
+//    if (dctw)
+//        delete dctw;
+    dctw = NULL;
     if (trainingContext)
         delete trainingContext;
 }

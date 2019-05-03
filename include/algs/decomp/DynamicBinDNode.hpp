@@ -31,7 +31,7 @@ namespace vmm_algs_decomp {
 
     class DynamicBinDNode : public AbsBinaryDNode {
     public:
-        DynamicBinDNode(int abSize, AbsBinaryDNode* rightChild,  AbsBinaryDNode* leftChild, int softModelDepth) : AbsBinaryDNode(abSize, rightChild, leftChild, softModelDepth) {
+        DynamicBinDNode(int abSize, shared_ptr<AbsBinaryDNode> rightChild,  shared_ptr<AbsBinaryDNode> leftChild, int softModelDepth) : AbsBinaryDNode(abSize, rightChild, leftChild, softModelDepth) {
             myType = nodeType::DynamicBinDNode;
         }
 
@@ -40,7 +40,7 @@ namespace vmm_algs_decomp {
                 RIGHT :
                 LEFT;
 
-            double prediction = softClasifier->learn(symbol, direction, context->getIterator());
+            double prediction = softClasifier.learn(symbol, direction, context->getIterator());
     /**@todo
      * new TernaryContext(children[0].descendants, children[1].descendants, context)
      * */

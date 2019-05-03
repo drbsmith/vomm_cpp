@@ -56,8 +56,8 @@ private:
 
     // BDS: Do these properties need to be public? Not very safe...
     vector<int> idStr;
-    vector<double> *nextSymProbability;/*ZZZ*/
-    PSTChildren* children;
+    vector<double> nextSymProbability;/*ZZZ*/
+    PSTChildren children;
 //    vector<DefaultPSTNode*>* children;/*ZZZ*/
     bool isLeaf;/*ZZZ*/
 
@@ -70,7 +70,7 @@ public:
 
     DefaultPSTNode(vector<int>* idStr, vector<double>* nextSymProbability);
     
-    virtual ~DefaultPSTNode();
+    ~DefaultPSTNode();
 
     int getAlphabetSize();
     vector<int>* getIDString();

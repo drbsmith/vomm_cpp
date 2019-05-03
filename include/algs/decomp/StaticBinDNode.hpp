@@ -31,7 +31,7 @@ namespace vmm_algs_decomp {
 
     class StaticBinDNode : public StaticDecompositionNode {
     public:
-          StaticBinDNode(int abSize, AbsBinaryDNode* rightChild, AbsBinaryDNode* leftChild, int softModelDepth) :
+          StaticBinDNode(int abSize, shared_ptr<AbsBinaryDNode> rightChild, shared_ptr<AbsBinaryDNode> leftChild, int softModelDepth) :
                     StaticDecompositionNode(abSize, rightChild, leftChild, softModelDepth) {
                 myType = nodeType::StaticBinDNode;
           }
@@ -41,7 +41,7 @@ namespace vmm_algs_decomp {
                 RIGHT :
                 LEFT;
               
-            double prediction = softClasifier->predict(symbol, direction, context->getIterator());
+            double prediction = softClasifier.predict(symbol, direction, context->getIterator());
             prediction *= children[direction]->predict(symbol, context);
             return prediction;
           }
@@ -52,9 +52,9 @@ namespace vmm_algs_decomp {
                 LEFT;
 
             try {
-                softClasifier->learn(symbol, direction, context->getIterator());
+                softClasifier.learn(symbol, direction, context->getIterator());
                 if (children[direction] && children[direction]->getType() == nodeType::StaticBinDNode) {
-                    ( (StaticBinDNode*) children[direction])->train(symbol, context);
+                    static_pointer_cast<StaticBinDNode>(children[direction])->train(symbol, context);
                 }
             }
             catch(std::exception e) {

@@ -49,7 +49,7 @@ namespace vmm_algs_decomp {
   /**
    * Build dynamic
    */
-        DecompositionNode* build(SampleIterator* sample);
+        shared_ptr<DecompositionNode> build(SampleIterator* sample);
 
   /***/
   /**
@@ -57,12 +57,12 @@ namespace vmm_algs_decomp {
  * (should never use code replication again..)
  */
         
-        StaticDecompositionNode* buildStatic(SampleIterator* samples);
+        shared_ptr<StaticDecompositionNode> buildStatic(SampleIterator* samples);
 
   /***/
 
     private:
-        AbsBinaryDNode* buildHuf(TreeMap* countMap);
+        shared_ptr<AbsBinaryDNode> buildHuf(TreeMap* countMap);
         
   /*****/
   //      calculateABCount()

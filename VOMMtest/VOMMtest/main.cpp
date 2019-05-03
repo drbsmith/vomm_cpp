@@ -7,17 +7,17 @@
 //
 
 // defines to test each of the vomm algorithms
-#define TEST_PST
-#define TEST_BIN
+//#define TEST_PST
+//#define TEST_BIN
 #define TEST_DCTW
-#define TEST_PPMC
-#define TEST_LZMS
+//#define TEST_PPMC
+//#define TEST_LZMS
 
 #define TEST_SERIALIZATION
 
 #define ALPHA_SIZE 256
 //#define TRAINING_SIZE 5000
-#define USE_MIDI
+//#define USE_MIDI
 
 #include <iostream>
 #include <vector>
@@ -40,7 +40,7 @@ using namespace std;
 
 int main(int argc, const char * argv[]) {
     vector<int> dataVec;
-    double* prob;
+    double* prob = NULL;
     
 #ifdef USE_MIDI
     MidiFile midifile("/Users/smith/Developer/vomm_cpp/01Prelude.mid");
@@ -75,7 +75,7 @@ int main(int argc, const char * argv[]) {
 #ifdef TEST_PST
     cout << "PST: " << endl;
     PSTPredictor* pst = NULL;
-    for (int i = 0; i < 100; i++) {
+    for (int i = 0; i < 10; i++) {
         if (pst != NULL)
             delete pst;
         pst = new PSTPredictor();;
@@ -92,10 +92,13 @@ int main(int argc, const char * argv[]) {
     cout << "P(c|abcd) : " << pst->predict('c', "abcd") << endl;
     cout << "P(d|ra) : " << pst->predict('d', "ra") << endl << endl;
     
-    for (int i = 0; i < 1000; i++)
+    for (int i = 0; i < 1000; i++) {
+        if (prob)
+            delete prob;
         prob = pst->predictAll("abrac");
+    }
     cout << "P(all) : " << prob[99] << endl << endl;
-    delete prob;
+    delete prob; prob = NULL;
     
 #ifdef TEST_SERIALIZATION
     string pstModel = pst->ModelToString();
@@ -103,7 +106,8 @@ int main(int argc, const char * argv[]) {
 //    cout << pstModel << endl;
     
     for (int i = 0; i < 100; i++) {
-        delete pst;
+        if (pst)
+            delete pst;
         pst = new PSTPredictor();
         pst->ModelFromString(pstModel);
     }
@@ -114,7 +118,10 @@ int main(int argc, const char * argv[]) {
     cout << "Reconstituted from serialized string:" << endl;
     cout << "logeval : " << pst->logEval("cadabra") << endl;
     cout << "P(c|abra) : " << pst->predict('c', "abra") << endl << endl;
+    
 #endif
+    
+    delete pst;
 #endif // PST
 #ifdef TEST_BIN
     cout << "Binary CTW:" << endl;
@@ -164,10 +171,13 @@ int main(int argc, const char * argv[]) {
 //    cout << "P(z|the la) : " << dctw->predict('z', "the la") << endl;
 //    cout << "P(y|the la) : " << dctw->predict('y', "the la") << endl;
 //    cout << "P( |the la) : " << dctw->predict(' ', "the la") << endl;
-    for (int i = 0; i < 1000; i++)
+    for (int i = 0; i < 100; i++) {
+        if (prob)
+            delete prob;
         prob = dctw->predictAll("abrac");
+    }
     cout << "P(all) : " << prob[99] << endl << endl;
-    delete prob;
+    delete prob; prob = NULL;
     
     delete dctw;
 //    cout << dctw->ModelToString() << endl; // this is not finished, for serializing and deserializing. It's a complex tree with lots of nodes!
@@ -194,16 +204,20 @@ int main(int argc, const char * argv[]) {
     cout << "P(c|abcd) : " << ppmc->predict('c', "abcd") << endl;
     cout << "P(d|ra) : " << ppmc->predict('d', "ra") << endl << endl;
     
-    for (int i = 0; i < 1000; i++)
+    for (int i = 0; i < 100; i++) {
+        if (prob)
+            delete prob;
         prob = ppmc->predictAll("abrac");
+    }
     cout << "P(all) : " << prob[96] << endl;
-    delete prob;
+    delete prob; prob = NULL;
     
 #ifdef TEST_SERIALIZATION
     string model = ppmc->ModelToString();    // get the model encoded as an ascii string
     
     for (int i = 0; i < 100; i++) {
-        delete ppmc;
+        if (ppmc)
+            delete ppmc;
         ppmc = new PPMCPredictor();
         
         ppmc->init(ALPHA_SIZE,5);

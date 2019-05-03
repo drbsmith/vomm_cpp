@@ -13,6 +13,7 @@ but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
 GNU General Public License (<a href="http://www.gnu.org/copyleft/gpl.html">GPL</a>) for more details.*/ 
 
+#include <memory>
 #include "../../util/Context.hpp"
 
 namespace vmm_algs_decomp {
@@ -26,13 +27,15 @@ namespace vmm_algs_decomp {
      * @version 1.0
      */
 
-    class DecompositionNode {
+    class DecompositionNode : public std::enable_shared_from_this<DecompositionNode> {
     public:
-        enum nodeType {BinDLeaf, AbsBinaryDNode, DynamicBinDNode, StaticBinDNode, StaticDecompositionNode};
+        enum nodeType {BinDLeaf, AbsBinaryDNode, DynamicBinDNode, StaticBinDNode, StaticDecompositionNode, Null};
     protected:
         nodeType myType;
     public:
         nodeType getType() { return myType; }
+        
+        virtual ~DecompositionNode() {} // myType = nodeType::Null; }
       /**
        * Predicts the probability of symbol according to this DecompositionNode
        * and its descendants.

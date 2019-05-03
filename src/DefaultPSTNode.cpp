@@ -23,39 +23,41 @@ const string DefaultPSTNode::XML_CHILDREN_ET ="</children>";
 
 DefaultPSTNode::DefaultPSTNode() {
     absize = ABSIZE;
-    nextSymProbability = new vector<double>(ABSIZE);
-    children = new PSTChildren(); // new vector<DefaultPSTNode*>(ABSIZE);/*ZZZ*/
+    nextSymProbability = vector<double>(ABSIZE, 0);
+//    children = new PSTChildren(); // new vector<DefaultPSTNode*>(ABSIZE);/*ZZZ*/
     isLeaf = true;
 }
 
 DefaultPSTNode::DefaultPSTNode(int alphabetSize) {
     absize = alphabetSize;
-    nextSymProbability = new vector<double>(absize);
-    children = new PSTChildren(); //new vector<DefaultPSTNode*>(absize);
+    nextSymProbability = vector<double>(absize, 0);
+//    children = new PSTChildren(); //new vector<DefaultPSTNode*>(absize);
     isLeaf = true;
 }
 DefaultPSTNode::DefaultPSTNode(vector<int>* _idStr, vector<double>* _nextSymProbability) {
     if (_idStr)
-        idStr.assign(_idStr->begin(), _idStr->end());
-    nextSymProbability = _nextSymProbability;
-    if (nextSymProbability)
-        absize = (int)nextSymProbability->size();
-    else
-        absize = 0;
-    children = new PSTChildren(); //new vector<DefaultPSTNode*>(absize);
+        for (vector<int>::iterator it = _idStr->begin(); it != _idStr->end(); it++)
+            idStr.push_back(*it); //assign(_idStr->begin(), _idStr->end());
+    if (_nextSymProbability)
+        for (vector<double>::iterator it = _nextSymProbability->begin(); it != _nextSymProbability->end(); it++)
+            nextSymProbability.push_back(*it);
+//    nextSymProbability.assign(_nextSymProbability->begin(), _nextSymProbability->end());
+    
+    absize = (int)nextSymProbability.size();
+//    children = new PSTChildren(); //new vector<DefaultPSTNode*>(absize);
     isLeaf = true;
 }
 
 DefaultPSTNode::~DefaultPSTNode() {
-    if (nextSymProbability)
-        delete nextSymProbability;
-    if (children) {
-        for (auto const& x: *children) { //int i = 0; i < children->size(); i++)
-            //if (children->at(i))
-            delete x.second; //children->at(i)->second;
+//    if (nextSymProbability)
+//        delete nextSymProbability;
+//    if (children) {
+        for (auto const& x: *&children) { //int i = 0; i < children.size(); i++)
+            //if (children.at(i))
+            delete x.second; //children.at(i)->second;
         }
-        delete children;
-    }
+//        delete children;
+//    }
 }
 
 int DefaultPSTNode::getAlphabetSize(){
@@ -67,8 +69,8 @@ vector<int>* DefaultPSTNode::getIDString(){
 }
 
 double DefaultPSTNode::predict(int ch) {
-    if (ch < nextSymProbability->size())
-        return nextSymProbability->at(ch);
+    if (ch < nextSymProbability.size())
+        return nextSymProbability.at(ch);
     else
         return -1;  // is this ok? Or should it be MAX_INT?
 }
@@ -99,10 +101,10 @@ vector<double>* DefaultPSTNode::predict(){
 //    if (pArr->size() != absize) {
 //        throw "ILL pArr size in predict";
 //    }
-    if (!nextSymProbability)
-        return NULL;
+//    if (!nextSymProbability)
+//        return NULL;
     
-    return nextSymProbability; // new vector<double>(*nextSymProbability);
+    return &nextSymProbability; // new vector<double>(*nextSymProbability);
 //    pArr->clear();
 //    pArr->assign(nextSymProbability->begin(), nextSymProbability->end());
 //    pArr->insert(pArr->end(), nextSymProbability->begin(), nextSymProbability->end());
@@ -134,17 +136,17 @@ PSTNodeInterface* DefaultPSTNode::get(vector<Byte> *byteSeq){
 }
 
 PSTNodeInterface* DefaultPSTNode::get(ContextIterator* context){
-    if (!context || !children)
+    if (!context) // || !children)
         return NULL;
     
     if (context->hasNext()) {
         int symbol = context->nextSymbol();
-        PSTChildren::iterator node = children->find(symbol);
-        if (node != children->end())
+        PSTChildren::iterator node = children.find(symbol);
+        if (node != children.end())
             return node->second->get(context);
         else
             return this;
-//        return (children->at(symbol) != NULL) ? children->at(symbol)->get(context) : this;
+//        return (children.at(symbol) != NULL) ? children.at(symbol)->get(context) : this;
     }
     else{
         return (PSTNodeInterface*)this;
@@ -164,9 +166,9 @@ PSTNodeInterface* DefaultPSTNode::get(string sbuff){
 //    else{
 //        int nextSymIndex = sbuff[strLen-1];
 //        //            sbuff.setLength(strLen-1);    // this would take one character off the end?
-//        PSTChildren::iterator node = children->find(nextSymIndex);
-//        if (node != children->end()) { //children->at(nextSymIndex) != NULL) {
-//            PSTNodeInterface* ret = node->second->get(sbuff); // children->at(nextSymIndex)->get(sbuff);
+//        PSTChildren::iterator node = children.find(nextSymIndex);
+//        if (node != children.end()) { //children.at(nextSymIndex) != NULL) {
+//            PSTNodeInterface* ret = node->second->get(sbuff); // children.at(nextSymIndex)->get(sbuff);
 //            //                sbuff.setLength(strLen);  // and then all cases will set it back to full size? why?
 //            return ret;
 //        } else {// therefore this corresponds to the largest suffix.
@@ -183,9 +185,9 @@ PSTNodeInterface* DefaultPSTNode::get(vector<int>* sbuff){
     else{
         int nextSymIndex = sbuff->at(strLen-1);
         //            sbuff.setLength(strLen-1);    // this would take one character off the end?
-        PSTChildren::iterator node = children->find(nextSymIndex);
-        if (node != children->end()) { //children->at(nextSymIndex) != NULL) {
-            PSTNodeInterface* ret = node->second->get(sbuff); // children->at(nextSymIndex)->get(sbuff);
+        PSTChildren::iterator node = children.find(nextSymIndex);
+        if (node != children.end()) { //children.at(nextSymIndex) != NULL) {
+            PSTNodeInterface* ret = node->second->get(sbuff); // children.at(nextSymIndex)->get(sbuff);
             //                sbuff.setLength(strLen);  // and then all cases will set it back to full size? why?
             return ret;
         } else {// therefore this corresponds to the largest suffix.
@@ -196,12 +198,12 @@ PSTNodeInterface* DefaultPSTNode::get(vector<int>* sbuff){
 }
 
 PSTNodeInterface* DefaultPSTNode::get(int symbol) {
-    PSTChildren::iterator node = children->find(symbol);
-    if (node != children->end())
+    PSTChildren::iterator node = children.find(symbol);
+    if (node != children.end())
         return node->second;
     else
         return NULL;
-//    return (PSTNodeInterface*)children->at((short)symbol);
+//    return (PSTNodeInterface*)children.at((short)symbol);
 }
 
 PSTNodeInterface* DefaultPSTNode::get(vector<Byte> *bytes, int currentByteIndex) {
@@ -209,9 +211,9 @@ PSTNodeInterface* DefaultPSTNode::get(vector<Byte> *bytes, int currentByteIndex)
         return this;
     } else {
         int nextSymIndex = (int)bytes->at(currentByteIndex);
-        PSTChildren::iterator node = children->find(nextSymIndex);
-        if (node != children->end()) { //children->at(nextSymIndex) != NULL){
-            PSTNodeInterface* ret = node->second->get(bytes, currentByteIndex-1); // children->at(nextSymIndex)->get(bytes, currentByteIndex-1);
+        PSTChildren::iterator node = children.find(nextSymIndex);
+        if (node != children.end()) { //children.at(nextSymIndex) != NULL){
+            PSTNodeInterface* ret = node->second->get(bytes, currentByteIndex-1); // children.at(nextSymIndex)->get(bytes, currentByteIndex-1);
             return ret;
         } else {// therefore this corresponds to the largest suffix.
             return this;
@@ -221,26 +223,26 @@ PSTNodeInterface* DefaultPSTNode::get(vector<Byte> *bytes, int currentByteIndex)
 void DefaultPSTNode::insert(int symbol, vector<double>* nextSymProbability){
     if (isLeaf) {
         isLeaf = false;
-        if (children) { // should never be NULL, don't really need this check
-            for (auto& x: *children) { //int i = 0; i < children->size(); i++)
-                //if (children->at(i)) {
-                delete x.second; // children->at(i).second;
-//                    delete children->at(i);
+//        if (children) { // should never be NULL, don't really need this check
+            for (auto& x: *&children) { //int i = 0; i < children.size(); i++)
+                //if (children.at(i)) {
+                delete x.second; // children.at(i).second;
             }
-//            delete children;
-            children->clear();
-        }
-//        children = new vector<DefaultPSTNode*>(absize);
+            children.clear();
+//        }
     }
     vector<int> newIDStr;
     newIDStr.push_back(symbol);
     newIDStr.insert(newIDStr.end(), idStr.begin(), idStr.end());
-    DefaultPSTNode* newNode = new DefaultPSTNode(&newIDStr, nextSymProbability);
-    if (children != NULL)   // should never be NULL, but for safety
-        children->insert(PSTNode(symbol, newNode));
-    else
-        delete newNode;
-//    children->at(symbol) = newNode;
+    PSTNode nNode;
+    nNode.first = symbol;
+//    DefaultPSTNode* newNode
+    nNode.second = new DefaultPSTNode(&newIDStr, nextSymProbability);
+//    if (children != NULL)   // should never be NULL, but for safety
+    children.insert(nNode); //PSTNode(symbol, newNode));
+//    else
+//        delete newNode;
+//    children.at(symbol) = newNode;
 }
 /**
  * @return this node sub tree height
@@ -250,9 +252,9 @@ int DefaultPSTNode::subTreeHeight() {
         return 0;
     } else {
         int height = 0;
-        for (auto& x: *children) { //int i = 0; i < children->size(); ++i) {
-            //if (children->at(i) != NULL) {
-            int childH = x.second->subTreeHeight(); // children->at(i)->subTreeHeight();
+        for (auto& x: *&children) { //int i = 0; i < children.size(); ++i) {
+            //if (children.at(i) != NULL) {
+            int childH = x.second->subTreeHeight(); // children.at(i)->subTreeHeight();
             height = (height > childH ? height : childH);
             //}
         }
@@ -280,10 +282,10 @@ string DefaultPSTNode::toString() {
 //     toString.append(XML_CHILDREN_ST);
 
     ss << XML_CHILDREN_ST;
-    for (auto& x: *children) { //int i=0; i < children->size(); ++i){
-        if (x.second != NULL) { //children->at(i) != NULL){
+    for (auto& x: *&children) { //int i=0; i < children.size(); ++i){
+        if (x.second != NULL) { //children.at(i) != NULL){
             ss << endl; //            toString.append(tabs);
-            ss << x.second->toString(); // children->at(i)->toString(); //toString.append(children[i]);
+            ss << x.second->toString(); // children.at(i)->toString(); //toString.append(children[i]);
         }
     }
     ss << XML_CHILDREN_ET;
@@ -344,6 +346,7 @@ DefaultPSTNode* DefaultPSTNode::FromString(string data) {    // reconstitute fro
     }
     
     newNode = new DefaultPSTNode(&id, prob);
+    delete prob;
     newNode->isLeaf = leaf;
     
     data = data.substr(probEnd+XML_PROB_ET.size());  // take off probabilities and close brace
@@ -358,13 +361,15 @@ DefaultPSTNode* DefaultPSTNode::FromString(string data) {    // reconstitute fro
                 break;  // no child = corrupt data
             
             data = data.substr(child.size());        // strip off child string
-            DefaultPSTNode* childNode = DefaultPSTNode::FromString(child);
-            if (childNode != NULL) {
-//                DefaultPSTNode* temp = newNode->children->at(childNode->idStr[0]);
-//                if (newNode->children->find((int)childNode->idStr[0]) != newNode->children->end())
+            PSTNode childNode;
+            childNode.second = DefaultPSTNode::FromString(child);
+            if (childNode.second != NULL) {
+                childNode.first = childNode.second->idStr[0];
+//                DefaultPSTNode* temp = newNode->children.at(childNode->idStr[0]);
+//                if (newNode->children.find((int)childNode->idStr[0]) != newNode->children.end())
                 // erase should do nothing if it can't find the key in question, so above check should be unneccessary
-                newNode->children->erase((int)childNode->idStr[0]);
-                newNode->children->insert(PSTNode((int)childNode->idStr[0], childNode)); //at(childNode->idStr[0]) = childNode;
+                newNode->children.erase(childNode.first);
+                newNode->children.insert(childNode); //at(childNode->idStr[0]) = childNode;
 //                delete temp;
             }
         }
@@ -375,9 +380,9 @@ DefaultPSTNode* DefaultPSTNode::FromString(string data) {    // reconstitute fro
 string DefaultPSTNode::prob2Str() {
     stringstream sbuff;
     sbuff << XML_PROB_ST;
-    for (int i = 0; i < nextSymProbability->size(); i++){
-      if (nextSymProbability->at(i) > 0.0001 ) {
-          sbuff << i << "=" << nextSymProbability->at(i) << " ";
+    for (int i = 0; i < nextSymProbability.size(); i++){
+      if (nextSymProbability.at(i) > 0.0001 ) {
+          sbuff << i << "=" << nextSymProbability.at(i) << " ";
 //        sbuff.append((char)i).append('=').append(nextSymProbability[i]).append(',');
       }
     }

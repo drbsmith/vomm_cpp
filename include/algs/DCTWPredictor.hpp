@@ -49,7 +49,7 @@ namespace vmm_algs_decomp {
     private:
         const static double NEGTIVE_INVERSE_LOG_2;
 
-        StaticDecompositionNode* dctw;
+        shared_ptr<StaticDecompositionNode> dctw;
 
         int abSize;
         int vmmOrder;

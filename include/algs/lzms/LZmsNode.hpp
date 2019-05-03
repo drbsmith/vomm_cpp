@@ -5,6 +5,8 @@ namespace vmm_algs_lzms {
 
     class LZmsNode {
     public:
+        virtual ~LZmsNode() {}
+        
         virtual int GetAlphabetSize() =0;
 
         // TODO: it wants to return the final leaf, and discard the container. Will they get cleaned up ok?

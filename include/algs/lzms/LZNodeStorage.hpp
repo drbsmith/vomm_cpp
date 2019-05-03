@@ -29,6 +29,7 @@ namespace vmm_algs_lzms {
 class LZNodeStorage {
 
 public:
+    virtual ~LZNodeStorage() {};
     virtual void put(int key, LZmsNode *node) =0;
     virtual LZmsNode* get(int key) =0;
     virtual std::vector<LZmsNode*> *toArray() =0;

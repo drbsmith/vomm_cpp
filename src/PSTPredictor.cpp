@@ -16,7 +16,7 @@
 
 using namespace vmm_algs_pst;
 
-PSTPredictor::PSTPredictor() : pst(NULL), pstPredictor(NULL), trained(false) { }
+PSTPredictor::PSTPredictor() : trained(false), pst(NULL), pstPredictor(NULL)  { }
 
 PSTPredictor::~PSTPredictor() {
     if (pst)
@@ -123,7 +123,7 @@ double* PSTPredictor::predictAll(vector<int>* context) {
                 pstPredictor->increment(sym);
             }
         }
-        pArr = pstPredictor->predict();
+        pArr = pstPredictor->predict(); // returns pointer to internal vector, DO NOT DELETE
         
         double* out = new double[pArr->size()];
         for (int j = 0; j < pArr->size(); j++) {

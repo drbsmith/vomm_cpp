@@ -17,6 +17,7 @@ GNU General Public License (<a href="http://www.gnu.org/copyleft/gpl.html">GPL</
 #include <map>
 #include <cmath>
 #include <string>
+#include <memory> // shared_ptr
 // #include <bitset> // would like to use this, but size isn't known at compile time and can't be changed dynamically
 
 #include "../../util/Context.hpp"
@@ -30,7 +31,7 @@ namespace vmm_algs_decomp {
     using namespace std;
     using namespace vmm_algs_ctw;
     
-    typedef pair<const int, DecompositionNode*> LeafNode;
+    typedef pair<const int, shared_ptr<DecompositionNode> > LeafNode;
     typedef map<LeafNode::first_type, LeafNode::second_type> LeafMap;    // leaves in our tree
     typedef pair<const int, LeafMap*> TreeNode;
     typedef map<TreeNode::first_type, TreeNode::second_type> TreeMap;     // trunks in our tree
@@ -69,9 +70,9 @@ namespace vmm_algs_decomp {
   //private static final int SOFTCLASSIFIER_DEPTH = 16;
         const static int BRANCHING_FACTOR = 2;
     protected:
-        DecompVolfNode *softClasifier;
+        DecompVolfNode softClasifier;
         BitSet* descendants;
-        vector<AbsBinaryDNode*> children;
+        vector<shared_ptr<AbsBinaryDNode> > children;
         
         // mySym, used primarily by BinDLeaf
         int mySym;
@@ -83,9 +84,9 @@ namespace vmm_algs_decomp {
 //        }
 
     public:
+        AbsBinaryDNode(int abSize, shared_ptr<AbsBinaryDNode> rightChild, shared_ptr<AbsBinaryDNode> leftChild, int softModelDepth);
         virtual ~AbsBinaryDNode();
         
-        AbsBinaryDNode(int abSize, AbsBinaryDNode* rightChild, AbsBinaryDNode* leftChild, int softModelDepth);
 
         virtual double predict(int symbol, Context* context)=0; //
 
@@ -103,8 +104,10 @@ namespace vmm_algs_decomp {
         std::string toString();
         static AbsBinaryDNode* fromString(std::string data);
         
+        static void DeleteTreeMap(TreeMap* tree);
+        
     private:
-        void buildLevels(AbsBinaryDNode* root, TreeMap* levelsMap, int level);
+        void buildLevels(shared_ptr<AbsBinaryDNode> root, TreeMap* levelsMap, int level);
 
     };  // class AbsBinaryDNode
 }   // namespace

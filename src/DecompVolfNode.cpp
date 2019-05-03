@@ -106,7 +106,7 @@ DecompVolfNode* DecompVolfNode::fromString(std::string data) {
         for(std::string s; iss >> s; )
             result.push_back(s);
         
-        DecompVolfNode *active = NULL;
+//        DecompVolfNode *active = NULL;
         for (vector<string>::iterator it = result.begin(); it != result.end(); it++) {
             if ((*it).size() >= 5) { // minimum size for a node specification
                 if ((*it)[0] == '[') { // it's a child

@@ -105,18 +105,7 @@ void BitSet::fromString(std::string data) {
      * @version 1.0
      */
 
-AbsBinaryDNode::~AbsBinaryDNode() {
-    while (children.size() > 0) {
-        delete *(children.begin());
-        children.erase(children.begin());
-    }
-    if (softClasifier)
-        delete softClasifier;
-    if (descendants)
-        delete descendants;
-}
-
-AbsBinaryDNode::AbsBinaryDNode(int abSize, AbsBinaryDNode* rightChild, AbsBinaryDNode* leftChild, int softModelDepth) {
+AbsBinaryDNode::AbsBinaryDNode(int abSize, shared_ptr<AbsBinaryDNode> rightChild, shared_ptr<AbsBinaryDNode> leftChild, int softModelDepth) {
     myType = nodeType::AbsBinaryDNode;
     
     descendants = new BitSet(abSize);// all bits are initially false
@@ -140,8 +129,20 @@ AbsBinaryDNode::AbsBinaryDNode(int abSize, AbsBinaryDNode* rightChild, AbsBinary
     if (leftChild)
         descendants->OR(leftChild->descendants);
     
-    softClasifier = new DecompVolfNode();
-    softClasifier->init(abSize, VolfNode::DEFAULT_ALPHA_FACTOR);
+//    softClasifier = new DecompVolfNode();
+    softClasifier.init(abSize, VolfNode::DEFAULT_ALPHA_FACTOR);
+}
+
+AbsBinaryDNode::~AbsBinaryDNode() {
+//    while (children.size() > 0) {
+//        delete *(children.begin());
+//        children.erase(children.begin());
+//    }
+    children.clear();
+//    if (softClasifier)
+//        delete softClasifier;
+    if (descendants)
+        delete descendants;
 }
 
 vmm_algs_decomp::BitSet* AbsBinaryDNode::getDescendants() {
@@ -162,7 +163,7 @@ bool AbsBinaryDNode::equals(AbsBinaryDNode* obj) {
 
 TreeMap* AbsBinaryDNode::getDescendantsByLevel() {
     TreeMap* levelsMap = new TreeMap();
-    buildLevels(this, levelsMap, 0);
+    buildLevels(static_pointer_cast<AbsBinaryDNode>(shared_from_this()), levelsMap, 0);
     return levelsMap;
 }
 
@@ -176,13 +177,13 @@ std::string AbsBinaryDNode::toString() {
 //    data << "absBDNode" << endl;
     data << "m" << mySym << "|";
     
-    if (softClasifier)
-        data << "s" << softClasifier->toString() << "|";
+//    if (softClasifier)
+        data << "s" << softClasifier.toString() << "|";
     
     if (descendants)
         data << "d" << descendants->toString() << "|";
     
-    for (vector<AbsBinaryDNode*>::iterator it = children.begin(); it != children.end(); it++) {
+    for (vector<shared_ptr<AbsBinaryDNode>>::iterator it = children.begin(); it != children.end(); it++) {
         if (*it != NULL)
             data << "c" << *it << " " << (*it)->toString() << "|";
     }
@@ -211,7 +212,23 @@ AbsBinaryDNode* AbsBinaryDNode::fromString(std::string data) {
     return NULL;
 }
 
-void AbsBinaryDNode::buildLevels(AbsBinaryDNode* root, TreeMap* levelsMap, int level){
+void AbsBinaryDNode::DeleteTreeMap(TreeMap* tree) {
+    
+    // TODO: are DecompositionNodes being held in another linked list? Using AbsBinDNodes?
+    for (auto const& x: *tree) {
+        LeafMap* lm = x.second;
+//        for (auto const& y: *lm) {
+//            if (y.second->getType() == nodeType::StaticDecompositionNode || y.second->getType() == nodeType::BinDLeaf || y.second->getType() == nodeType::AbsBinaryDNode)
+//                delete y.second;
+//        }
+        delete x.second;
+    }
+    tree->clear();
+    
+    delete tree;
+}
+
+void AbsBinaryDNode::buildLevels(shared_ptr<AbsBinaryDNode> root, TreeMap* levelsMap, int level){
     if (root->getType() == nodeType::BinDLeaf) { //root instanceof BinDLeaf){   // this is a true leaf, it doesn't have children to follow
         if (levelsMap->find(level) == levelsMap->end()) {
             levelsMap->insert(TreeNode(level, new LeafMap()));

@@ -167,12 +167,11 @@ void PSTBuilder::init(double pMin, double nextSymProbMin){
         suffStrNextSymProb.push_back(p);
     }
     
-    vector<double>* rootsProb = new vector<double>; //(alphabetSize);
+    vector<double> rootsProb; // = new vector<double>; //(alphabetSize);
     //    System.arraycopy(prob,0,rootsProb,0,alphabetSize);
-    rootsProb->insert(rootsProb->end(), prob->begin(), prob->end());
+    rootsProb.insert(rootsProb.end(), prob->begin(), prob->end());
     delete prob;    // has been copied for pstRoot to use.
-    rootsProb = smooth(rootsProb, nextSymProbMin);
-    pstRoot = createPSTRoot(rootsProb); // create holds on to rootsProb
+    pstRoot = createPSTRoot(smooth(&rootsProb, nextSymProbMin)); // create holds on to rootsProb
 }
 
 void PSTBuilder::initGolan(double nextSymProbMin){
@@ -213,10 +212,10 @@ void PSTBuilder::initGolan(double nextSymProbMin){
         suffStrNextSymProb.push_back(prob);
     }
     
-    vector<double>* rootsProb = new vector<double>(alphabetSize);
+    vector<double> rootsProb; // = new vector<double>(alphabetSize);
     //    System.arraycopy(prob,0,rootsProb,0,alphabetSize);
-    rootsProb->insert(rootsProb->end(), prob->begin(), prob->end());
-    pstRoot = createPSTRoot(smooth(rootsProb, nextSymProbMin));
+    rootsProb.insert(rootsProb.end(), prob->begin(), prob->end());
+    pstRoot = createPSTRoot(smooth(&rootsProb, nextSymProbMin));
 }
 
 // StrNSymProb and suffStrNSymProb MUST be the same size!!!!
@@ -310,21 +309,20 @@ PSTNodeInterface* PSTBuilder::createPSTRoot(vector<double>* nextSymProb){
 }
 
 void PSTBuilder::addToTree(vector<int>* str, vector<double> *strNSymProb, double nextSymProbMin) {
+    vector<double> prob; // = new vector<double>;
     PSTNodeInterface* deepestNode = pstRoot->get(str);
     
     if (!deepestNode)
         return;
     
     if (deepestNode->getIDString()->size() == str->size()-1) {
-        vector<double>* prob = new vector<double>;
-        prob->insert(prob->end(), strNSymProb->begin(), strNSymProb->end());  // make our own copy to store
-        deepestNode->insert(str->at(0), smooth(prob, nextSymProbMin));
-        // do not delete 'prob', deepestNode keeps a pointer to it
+        prob.assign(strNSymProb->begin(), strNSymProb->end());
+        deepestNode->insert(str->at(0), smooth(&prob, nextSymProbMin));
     }
     else{
         vector<int> savedStrChHits, savedChStrHits;
-        savedStrChHits.insert(savedStrChHits.end(), charStrHits.begin(), charStrHits.end());
-        savedChStrHits.insert(savedChStrHits.end(), strCharHits.begin(), strCharHits.end());
+        savedStrChHits.assign(charStrHits.begin(), charStrHits.end());
+        savedChStrHits.assign(strCharHits.begin(), strCharHits.end());
         
         for (int i = (int)str->size() - (int)(deepestNode->getIDString()->size()) - 1; i > -1; --i) {
             int sym = str->at(i);
@@ -336,16 +334,16 @@ void PSTBuilder::addToTree(vector<int>* str, vector<double> *strNSymProb, double
             subStr.assign(str->begin()+i, str->end());
             initHitCounts(&subStr);    // get string from i to the end
             
-            vector<double>* prob = new vector<double>();
-            computeNextSymProb(prob);
-            deepestNode->insert(str->at(i), smooth(prob, nextSymProbMin));
+            computeNextSymProb(&prob);
+            smooth(&prob, nextSymProbMin);
+            deepestNode->insert(str->at(i), &prob);
         }
         // delete prob; <-- do not delete! the vectors are used by 'deepestNode'!
         
         charStrHits.clear();
-        charStrHits.insert(charStrHits.end(), savedChStrHits.begin(), savedChStrHits.end());
+        charStrHits.assign(savedChStrHits.begin(), savedChStrHits.end());
         strCharHits.clear();
-        strCharHits.insert(strCharHits.end(), savedStrChHits.begin(), savedStrChHits.end());
+        strCharHits.assign(savedStrChHits.begin(), savedStrChHits.end());
     }
 }
 

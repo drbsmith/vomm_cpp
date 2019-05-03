@@ -162,7 +162,7 @@ private:
         if (childOnContextPath == NULL)
             return NULL;    // error on nextSymbol
       vector<double>* ethaArr = childOnContextPath->learnAll(newSymbol, context);
-        if (ethaArr == NULL || ethaArr->size() < newSymbol+1);
+        if (ethaArr == NULL || ethaArr->size() < newSymbol+1)
             return NULL;    // error
       double childOnContextPw = ethaArr->at(newSymbol);
       double denominator = 0.0;

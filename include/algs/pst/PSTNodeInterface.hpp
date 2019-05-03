@@ -28,7 +28,7 @@ namespace vmm_algs_pst {
 
 class PSTNodeInterface {
 public:
-    virtual ~PSTNodeInterface() {}
+    virtual ~PSTNodeInterface() {};
     
     virtual vector<int>* getIDString()=0;
 
