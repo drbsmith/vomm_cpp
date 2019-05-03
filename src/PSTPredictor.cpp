@@ -16,7 +16,7 @@
 
 using namespace vmm_algs_pst;
 
-PSTPredictor::PSTPredictor() : pst(NULL), trained(false), pstPredictor(NULL)  { }
+PSTPredictor::PSTPredictor() : pst(NULL), pstPredictor(NULL), trained(false) { }
 
 PSTPredictor::~PSTPredictor() {
     if (pst)
@@ -60,7 +60,7 @@ void PSTPredictor::learn(vector<int>* trainingSequence) {
     
     pst = builder.build(samples, pMin, alpha, gamma, r, vmmOrder);
     
-//    string tree = ((DefaultPSTNode*)pst)->toString();
+    string tree = ((DefaultPSTNode*)pst)->toString();
     
     if (pstPredictor)
         delete pstPredictor;
@@ -85,8 +85,7 @@ double PSTPredictor::predict(int symbol, vector<int>* context) {
         for (int i = 0, sym = -1; i < context->size(); ++i) {
             sym = (int) context->at(i);
             if (sym < abSize) {
-//                pArr =
-                pstPredictor->predict();
+                pArr = pstPredictor->predict();
                 pstPredictor->increment(sym);
             }
         }
@@ -109,12 +108,38 @@ double* PSTPredictor::predictAll(vector<int>* context) {
     if (!trained)
         return NULL;
     
-    double* out = new double[abSize];
-    
-    for (int j = 0; j < abSize; j++) {
-        out[j] = predict(j, context);
+    try {
+        vector<double>* pArr = NULL; // = new double[abSize];
+        
+        //        if (pstPredictor)
+        //            delete pstPredictor;
+        //        pstPredictor = new PSTArithPredictor(pst);
+        //        PSTArithPredictor pstPredictor(pst);  <-- now retained at the class level
+        
+        for (int i = 0, sym = -1; i < context->size(); ++i) {
+            sym = (int) context->at(i);
+            if (sym < abSize) {
+                pArr = pstPredictor->predict();
+                pstPredictor->increment(sym);
+            }
+        }
+        pArr = pstPredictor->predict();
+        
+        double* out = new double[pArr->size()];
+        for (int j = 0; j < pArr->size(); j++) {
+            out[j] = pArr->at(j);
+        }
+        return out;
     }
-    return out;
+    catch (exception npe) { //NullPointerException npe) {
+        if (pst == NULL) {
+            //throw new VMMNotTrainedException();
+        }
+        else {
+            throw npe;
+        }
+    }
+    return NULL;
 }
 
 double PSTPredictor::logEval(vector<int>* testSequence) {

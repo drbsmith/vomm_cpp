@@ -35,8 +35,6 @@
 		43EFF5D120C1B1C200D563B5 /* PSTBuilder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 43EFF5D020C1B1C200D563B5 /* PSTBuilder.cpp */; };
 		43FA14762198B58A00FC8DEF /* LZmsTree.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 43FA14752198B58A00FC8DEF /* LZmsTree.cpp */; };
 		43FDB9491CE63D3C00343BBA /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 43FDB9431CE63D3C00343BBA /* main.cpp */; };
-		4A3DA841227B5AD200728D5C /* MidiFile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4A3DA840227B5AD200728D5C /* MidiFile.cpp */; };
-		4A3DA843227B5AF900728D5C /* FileIO.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4A3DA842227B5AF900728D5C /* FileIO.cpp */; };
 		9093D8801CF63EF800B43EC7 /* maxmspsdk.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 9093D87F1CF63EF800B43EC7 /* maxmspsdk.xcconfig */; };
 /* End PBXBuildFile section */
 
@@ -78,8 +76,6 @@
 		43EFF5D020C1B1C200D563B5 /* PSTBuilder.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = PSTBuilder.cpp; path = src/PSTBuilder.cpp; sourceTree = "<group>"; };
 		43FA14752198B58A00FC8DEF /* LZmsTree.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = LZmsTree.cpp; path = src/LZmsTree.cpp; sourceTree = "<group>"; };
 		43FDB9431CE63D3C00343BBA /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
-		4A3DA840227B5AD200728D5C /* MidiFile.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = MidiFile.cpp; path = ../../midifile/src/MidiFile.cpp; sourceTree = "<group>"; };
-		4A3DA842227B5AF900728D5C /* FileIO.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = FileIO.cpp; path = ../../midifile/src/FileIO.cpp; sourceTree = "<group>"; };
 		9093D87F1CF63EF800B43EC7 /* maxmspsdk.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = maxmspsdk.xcconfig; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
@@ -153,8 +149,6 @@
 		436DC31D20C9CA6300309429 /* VOMMtest */ = {
 			isa = PBXGroup;
 			children = (
-				4A3DA842227B5AF900728D5C /* FileIO.cpp */,
-				4A3DA840227B5AD200728D5C /* MidiFile.cpp */,
 				436DC33920C9CB1300309429 /* main.cpp */,
 			);
 			path = VOMMtest;
@@ -291,7 +285,6 @@
 				43126F9320CAF93C00C550B5 /* PSTPredictor.cpp in Sources */,
 				43BED68B21667C3400F03ACF /* ArithCodeModel.cpp in Sources */,
 				439FB3352199FA0F00BEF666 /* LZNodeHashStorage.cpp in Sources */,
-				4A3DA841227B5AD200728D5C /* MidiFile.cpp in Sources */,
 				43126F9620CAF94700C550B5 /* BinaryCTWPredictor.cpp in Sources */,
 				439FB3342199FA0900BEF666 /* LZNode.cpp in Sources */,
 				43BED68921667B2300F03ACF /* OfflinePPMModel.cpp in Sources */,
@@ -303,7 +296,6 @@
 				43BED6872163B6A800F03ACF /* PPMCPredictor.cpp in Sources */,
 				439FB3332199DB0900BEF666 /* LZmsPredictor.cpp in Sources */,
 				43BED691216E53E900F03ACF /* PPMNode.cpp in Sources */,
-				4A3DA843227B5AF900728D5C /* FileIO.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -314,12 +306,10 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 9093D87F1CF63EF800B43EC7 /* maxmspsdk.xcconfig */;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD)";
 				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
 				CLANG_CXX_LIBRARY = "libc++";
 				ENABLE_TESTABILITY = YES;
 				ONLY_ACTIVE_ARCH = NO;
-				SDKROOT = macosx;
 			};
 			name = Development;
 		};
@@ -327,10 +317,8 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 9093D87F1CF63EF800B43EC7 /* maxmspsdk.xcconfig */;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD)";
 				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
 				CLANG_CXX_LIBRARY = "libc++";
-				SDKROOT = macosx;
 			};
 			name = Deployment;
 		};
@@ -338,7 +326,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 9093D87F1CF63EF800B43EC7 /* maxmspsdk.xcconfig */;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD)";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				CLANG_CXX_LIBRARY = "libc++";
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
@@ -357,7 +345,7 @@
 				OTHER_LDFLAGS = "$(C74_SYM_LINKER_FLAGS)";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.cycling74.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = ml.vomm.pst;
-				SDKROOT = macosx;
+				SDKROOT = macosx10.11;
 				WRAPPER_EXTENSION = mxo;
 			};
 			name = Development;
@@ -366,7 +354,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 9093D87F1CF63EF800B43EC7 /* maxmspsdk.xcconfig */;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD)";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				CLANG_CXX_LIBRARY = "libc++";
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = YES;
@@ -384,7 +372,7 @@
 				OTHER_LDFLAGS = "$(C74_SYM_LINKER_FLAGS)";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.cycling74.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = ml.vomm.pst;
-				SDKROOT = macosx;
+				SDKROOT = macosx10.11;
 				WRAPPER_EXTENSION = mxo;
 			};
 			name = Deployment;

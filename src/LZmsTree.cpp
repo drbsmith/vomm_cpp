@@ -45,13 +45,11 @@ void LZmsTree::learnOffsetSequence(vector<int>* sequence, int offset) {
         // child == NULL
         if (minContext <= currentNode->getDepth())
             // just have to add on a single character
-            //child =
-            new LZNode(currentNode, sequence->at(i), true);
+            child = new LZNode(currentNode, sequence->at(i), true);
         else {
             // have to add on the rest of the window + a single character
             int length = fmin(minContext - currentNode->getDepth() + 1, sequence->size() - i);
-            //child =
-            LZNode::createBranch(currentNode, sequence, i, length);
+            child = LZNode::createBranch(currentNode, sequence, i, length);
             i += length;
         }
         
@@ -98,7 +96,7 @@ double LZmsTree::getProbablityOfSequence(std::vector<int>* sequence) {
         if (currentNode)    // unless root is invalid...
             child = currentNode->getChild(sequence->at(i));
         
-        if (child != NULL)
+        if (child)
             result += child->getLogLikelihoodFromParent();
         else
             result += currentNode->getLogLikelihoodToVirtualChild();
