@@ -51,6 +51,9 @@ namespace vmm_util {
             dataInd = 0;
             name = NULL_NAME;
         }
+        ~IntSampleIter() {
+            data.clear();
+        }
 
         bool hasNext() {
             return dataInd < data.size();

@@ -19,10 +19,10 @@ DecompVolfNode::~DecompVolfNode() {
     if (symCountArr)
         delete symCountArr;
     
-    vector<DecompVolfNode*>::iterator it = children.begin();
-    while (it != children.end()) {
-        delete *it++;
-    }
+//    vector<DecompVolfNode*>::iterator it = children.begin();
+//    while (it != children.end()) {
+//        delete *it++;
+//    }
     children.clear();
 }
 
@@ -43,10 +43,10 @@ void DecompVolfNode::init(int symABSize, int alphaFactor) {
     symCountArr[0] = 0; symCountArr[1] = 0;
     //        Arrays.fill(symCountArr,0);
     allCount = 0;
-    vector<DecompVolfNode*>::iterator it = children.begin();
-    while (it != children.end()) {
-        delete *it++;
-    }
+//    vector<DecompVolfNode*>::iterator it = children.begin();
+//    while (it != children.end()) {
+//        delete *it++;
+//    }
     children.clear();
     beta = 1.0;
 }
@@ -86,19 +86,19 @@ string DecompVolfNode::toString() {
     data << alphaInversed << "/";
     data << abSizeDivAlpha << "/";
     
-    for (vector<DecompVolfNode*>::iterator it = children.begin(); it != children.end(); it++) {
-        if (*it != NULL)
+    for (vector<shared_ptr<DecompVolfNode> >::iterator it = children.begin(); it != children.end(); it++) {
+        if (*it != nullptr)
             data << endl << "[" << *it << " " << (*it)->toString() << "]";
     }
     
     return data.str();
 }
 
-DecompVolfNode* DecompVolfNode::fromString(std::string data) {
+shared_ptr<DecompVolfNode> DecompVolfNode::fromString(std::string data) {
     if (data.size() < 8)
-        return NULL;
+        return nullptr;
     
-    DecompVolfNode* ret = NULL;
+    shared_ptr<DecompVolfNode> ret = nullptr;
     
     if (data[0] == 'd') {   // it's a node string
         std::vector<std::string> result;
@@ -111,15 +111,15 @@ DecompVolfNode* DecompVolfNode::fromString(std::string data) {
             if ((*it).size() >= 5) { // minimum size for a node specification
                 if ((*it)[0] == '[') { // it's a child
                     (*it).erase((*it).begin());
-                    DecompVolfNode* child = new DecompVolfNode(*it);
+                    shared_ptr<DecompVolfNode> child = make_shared<DecompVolfNode>(*it);
                     if (ret)    // should always be set already.
                         ret->AddChild(child);
                     else
-                        delete child;
+                        child = nullptr; //delete child;
                     
 //                    active = child;
                 }  else {    // it's the first node
-                    ret = new DecompVolfNode(*it);   // create the root
+                    ret = make_shared<DecompVolfNode>(*it);   // create the root
 //                    active = ret;
                 }
             }
@@ -173,14 +173,14 @@ DecompVolfNode::DecompVolfNode(string data) {
     }
 }
 
-void DecompVolfNode::AddChild(DecompVolfNode* child) {
-    if (child != NULL)
+void DecompVolfNode::AddChild(shared_ptr<DecompVolfNode> child) {
+    if (child != nullptr)
         children.push_back(child);
 }
 
 double* DecompVolfNode::predict(ContextIterator* context) {
     if (context->hasNext()) {
-        DecompVolfNode* childOnContextPath = getChild(context->nextSymbol());
+        shared_ptr<DecompVolfNode> childOnContextPath = getChild(context->nextSymbol());
         double *ethaArr = childOnContextPath->predict(context);
         double denominator = 0.0;
         //1. compute b'
@@ -211,7 +211,7 @@ double* DecompVolfNode::predict(ContextIterator* context) {
 double* DecompVolfNode::learnAll(int newSymbol, int symSetLabel, ContextIterator* context) {
     if (context->hasNext()) {
         
-        DecompVolfNode* childOnContextPath = getChild(context->nextSymbol());
+        shared_ptr<DecompVolfNode> childOnContextPath = getChild(context->nextSymbol());
         double *ethaArr = childOnContextPath->learnAll(newSymbol, symSetLabel, context);
         double childOnContextPw = ethaArr[symSetLabel];
         double denominator = 0.0;
@@ -259,12 +259,12 @@ double* DecompVolfNode::learnAll(int newSymbol, int symSetLabel, ContextIterator
     }
 }
 
-DecompVolfNode* DecompVolfNode::getChild(int sym) {
+shared_ptr<DecompVolfNode> DecompVolfNode::getChild(int sym) {
     if (children.size() < abSize) {
-        children.resize(abSize, NULL);
+        children.resize(abSize, nullptr);
     }
-    if (children.at(sym) == NULL) {
-        children.at(sym) = new DecompVolfNode();
+    if (children.at(sym) == nullptr) {
+        children.at(sym) = make_shared<DecompVolfNode>();
         children.at(sym)->init(abSize, alpha);
     }
     return children.at(sym);

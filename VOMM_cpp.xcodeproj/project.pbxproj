@@ -116,10 +116,12 @@
 		08FB77ADFE841716C02AAC07 /* Source */ = {
 			isa = PBXGroup;
 			children = (
+				43C5C7A4221A18F0000A150F /* AbsBinaryDNode.cpp */,
 				43BED68A21667C3400F03ACF /* ArithCodeModel.cpp */,
 				434DA3E420C46C2700FEB869 /* BinaryCTWPredictor.cpp */,
 				434DA3E620C4718A00FEB869 /* DCTWPredictor.cpp */,
 				43BED68E216E431B00F03ACF /* DecompositionTreeBuilder.cpp */,
+				43C5C7A8221A365B000A150F /* DecompVolfNode.cpp */,
 				43EFF5CE20C0C0A200D563B5 /* DefaultPSTNode.cpp */,
 				439FB3322199DB0900BEF666 /* LZmsPredictor.cpp */,
 				43FA14752198B58A00FC8DEF /* LZmsTree.cpp */,
@@ -135,8 +137,6 @@
 				43BED690216E53E900F03ACF /* PPMNode.cpp */,
 				43EFF5D020C1B1C200D563B5 /* PSTBuilder.cpp */,
 				434DA3E220C1C6CC00FEB869 /* PSTPredictor.cpp */,
-				43C5C7A4221A18F0000A150F /* AbsBinaryDNode.cpp */,
-				43C5C7A8221A365B000A150F /* DecompVolfNode.cpp */,
 			);
 			name = Source;
 			sourceTree = "<group>";

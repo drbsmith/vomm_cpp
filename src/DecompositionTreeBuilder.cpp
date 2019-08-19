@@ -12,10 +12,10 @@ using namespace vmm_algs_decomp;
 * @version 1.0
 */
 
-    DecompositionTreeBuilder::DecompositionTreeBuilder(int _absize, int _softModelDepth) {
-        absize = _absize;
-        softModelDepth = _softModelDepth;
-    }
+DecompositionTreeBuilder::DecompositionTreeBuilder(int _absize, int _softModelDepth) {
+    absize = _absize;
+    softModelDepth = _softModelDepth;
+}
 
 /**
 * Build dynamic
@@ -24,11 +24,12 @@ shared_ptr<DecompositionNode> DecompositionTreeBuilder::build(SampleIterator* sa
     TreeMap* countMap = calculateAbCount(sample);
 
     shared_ptr<AbsBinaryDNode> root = buildHuf(countMap);
+    AbsBinaryDNode::DeleteTreeMap(countMap);
 
     TreeMap* levelsMap = root->getDescendantsByLevel();
 
     int level, sym1, sym2, superSym;
-    LeafMap* oneLevel;
+    shared_ptr<LeafMap> oneLevel;
     shared_ptr<AbsBinaryDNode> node1, node2;
     shared_ptr<DynamicBinDNode> superNode;
 
@@ -52,7 +53,8 @@ shared_ptr<DecompositionNode> DecompositionTreeBuilder::build(SampleIterator* sa
             levelsMap->erase(level); //levelsMap.remove(level);
         }
 
-        superNode = make_shared<DynamicBinDNode>(absize, node1, node2, softModelDepth);
+               superNode = std::make_shared<DynamicBinDNode>();
+               superNode->Init(absize, node1, node2, softModelDepth);
 
         if (node2->getType() == DecompositionNode::nodeType::BinDLeaf) { //} instanceof BinDLeaf){
             superSym = sym2;
@@ -64,7 +66,7 @@ shared_ptr<DecompositionNode> DecompositionTreeBuilder::build(SampleIterator* sa
 
         level = level-1; // new Integer(level.intValue()-1);
         if (levelsMap->find(level) == levelsMap->end())
-            levelsMap->insert(TreeNode(level, new LeafMap()));
+            levelsMap->insert(TreeNode(level, make_shared<LeafMap>()));
         oneLevel = levelsMap->at(level);
         oneLevel->insert(LeafNode(superSym, superNode));
     }
@@ -76,7 +78,6 @@ shared_ptr<DecompositionNode> DecompositionTreeBuilder::build(SampleIterator* sa
     
     shared_ptr<DecompositionNode> ret = static_pointer_cast<DecompositionNode>((*it2).second);
     
-    AbsBinaryDNode::DeleteTreeMap(countMap);
     AbsBinaryDNode::DeleteTreeMap(levelsMap);
 //    delete root;
     return ret; //oneLevel.get(oneLevel.lastKey());
@@ -100,7 +101,7 @@ shared_ptr<StaticDecompositionNode> DecompositionTreeBuilder::buildStatic(Sample
 //        delete root;  // all of the tree is based on root. Deleting here erases the TreeMap. It appears that all nodes are then folded into the return node-tree
 
     int level, sym1, sym2, superSym;
-    LeafMap* oneLevel;
+    shared_ptr<LeafMap> oneLevel;
     shared_ptr<AbsBinaryDNode> node1, node2;
     shared_ptr<StaticBinDNode> superNode;
 
@@ -124,7 +125,8 @@ shared_ptr<StaticDecompositionNode> DecompositionTreeBuilder::buildStatic(Sample
             levelsMap->erase(level); //levelsMap.remove(level);
         }
 
-        superNode = make_shared<StaticBinDNode>(absize, node1, node2, softModelDepth);
+               superNode = make_shared<StaticBinDNode>();
+               superNode->Init(absize, node1, node2, softModelDepth);
 
         if (node2->getType() == DecompositionNode::nodeType::BinDLeaf) { //} instanceof BinDLeaf){
             superSym = sym2;
@@ -136,7 +138,7 @@ shared_ptr<StaticDecompositionNode> DecompositionTreeBuilder::buildStatic(Sample
 
         level = level-1; // new Integer(level.intValue()-1);
         if (levelsMap->find(level) == levelsMap->end())
-            levelsMap->insert(TreeNode(level, new LeafMap()));
+            levelsMap->insert(TreeNode(level, make_shared<LeafMap>()));
         oneLevel = levelsMap->at(level);
         oneLevel->insert(LeafNode(superSym, superNode));
     }
@@ -157,8 +159,7 @@ shared_ptr<StaticDecompositionNode> DecompositionTreeBuilder::buildStatic(Sample
 /***/
 
 shared_ptr<AbsBinaryDNode> DecompositionTreeBuilder::buildHuf(TreeMap* countMap) {
-    LeafMap *lowCount = NULL;
-    LeafMap *superCountVal = NULL;
+    shared_ptr<LeafMap> lowCount, superCountVal;
     shared_ptr<AbsBinaryDNode> node1, node2;
     shared_ptr<DynamicBinDNode> dnode;
     int count1, count2;
@@ -198,11 +199,12 @@ shared_ptr<AbsBinaryDNode> DecompositionTreeBuilder::buildHuf(TreeMap* countMap)
             countMap->erase(countMap->begin()); //countMap.remove(countMap.firstKey());
         }
 
-        dnode = make_shared<DynamicBinDNode>(absize, node1, node2, softModelDepth);
+              dnode = make_shared<DynamicBinDNode>();
+              dnode->Init(absize, node1, node2, softModelDepth);
 
         superCount = count1 + count2; //new Integer(count1.intValue()+count2.intValue());
         superCountVal = (countMap->find(superCount) != countMap->end()) ?
-          countMap->at(superCount) : new LeafMap();
+          countMap->at(superCount) : make_shared<LeafMap>();
 
         superCountVal->insert(LeafNode(superSym, dnode));
         countMap->insert(TreeNode(superCount, superCountVal));
@@ -233,10 +235,12 @@ TreeMap* DecompositionTreeBuilder::calculateAbCount(SampleIterator* sample){
         sym = i;
         count = countArr[i];
         if (countMap->find(count) == countMap->end()) {
-            countMap->insert(TreeNode(count, new LeafMap()));
+            countMap->insert(TreeNode(count, make_shared<LeafMap>()));
         }
-        LeafMap* lm = countMap->at(count);
-        lm->insert(LeafNode(sym, new BinDLeaf(sym, absize, softModelDepth)));
+        shared_ptr<LeafMap> lm = countMap->at(count);
+        auto binleaf = make_shared<BinDLeaf>();
+        binleaf->Init(sym, absize, softModelDepth);
+        lm->insert(LeafNode(sym, binleaf));
 //            ((TreeMap)countMap.get(count)).put(sym, new BinDLeaf(sym.intValue(), absize));
     }
     

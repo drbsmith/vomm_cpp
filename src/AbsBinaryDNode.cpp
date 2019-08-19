@@ -27,10 +27,17 @@
 using namespace vmm_algs_decomp;
 using namespace std;
 
+BitSet::BitSet() {
+    
+}
 BitSet::BitSet(unsigned int size) {
     bits.resize(size, 0);   // set all to false
 }
 BitSet::~BitSet() {
+}
+
+void BitSet::resize(unsigned int size) {
+    bits.resize(size, 0);
 }
 
 void BitSet::OR(BitSet *other) {
@@ -105,32 +112,13 @@ void BitSet::fromString(std::string data) {
      * @version 1.0
      */
 
+AbsBinaryDNode::AbsBinaryDNode() {
+    myType = nodeType::AbsBinaryDNode;
+}
 AbsBinaryDNode::AbsBinaryDNode(int abSize, shared_ptr<AbsBinaryDNode> rightChild, shared_ptr<AbsBinaryDNode> leftChild, int softModelDepth) {
     myType = nodeType::AbsBinaryDNode;
     
-    descendants = new BitSet(abSize);// all bits are initially false
-    children.resize(BRANCHING_FACTOR);
-    children[RIGHT] = rightChild;
-    children[LEFT] = leftChild;
-    
-    // -- ASSERT --
-    if (rightChild && leftChild) {
-        BitSet test(abSize);
-        test.OR(rightChild->descendants);
-        test.AND(leftChild->descendants);
-        
-        if (test.Cardinality() != 0) {  // they can't be the same.
-            throw "ILL decomp node init: duplicated descendant";
-        }
-    }
-    
-    if (rightChild)
-        descendants->OR(rightChild->descendants);
-    if (leftChild)
-        descendants->OR(leftChild->descendants);
-    
-//    softClasifier = new DecompVolfNode();
-    softClasifier.init(abSize, VolfNode::DEFAULT_ALPHA_FACTOR);
+    Init(abSize, rightChild, leftChild, softModelDepth);
 }
 
 AbsBinaryDNode::~AbsBinaryDNode() {
@@ -141,20 +129,46 @@ AbsBinaryDNode::~AbsBinaryDNode() {
     children.clear();
 //    if (softClasifier)
 //        delete softClasifier;
-    if (descendants)
-        delete descendants;
+//    if (descendants)
+//        delete descendants;
 }
 
+void AbsBinaryDNode::Init(int abSize, shared_ptr<AbsBinaryDNode> rightChild, shared_ptr<AbsBinaryDNode> leftChild, int softModelDepth) {
+    
+    descendants.resize(abSize);// = new BitSet(abSize);// all bits are initially false
+    children.resize(BRANCHING_FACTOR);
+    children[RIGHT] = rightChild;
+    children[LEFT] = leftChild;
+    
+    // -- ASSERT --
+    if (rightChild && leftChild) {
+        BitSet test(abSize);
+        test.OR(&(rightChild->descendants));
+        test.AND(&(leftChild->descendants));
+        
+        if (test.Cardinality() != 0) {  // they can't be the same.
+            throw "ILL decomp node init: duplicated descendant";
+        }
+    }
+    
+    if (rightChild)
+        descendants.OR(&(rightChild->descendants));
+    if (leftChild)
+        descendants.OR(&(leftChild->descendants));
+    
+    //    softClasifier = new DecompVolfNode();
+    softClasifier.init(abSize, VolfNode::DEFAULT_ALPHA_FACTOR);
+}
 vmm_algs_decomp::BitSet* AbsBinaryDNode::getDescendants() {
-    return descendants;
+    return &descendants;
 }
 //  int hashCode(){
-//    return descendants->hashCode();
+//    return descendants.hashCode();
 //  }
 
 bool AbsBinaryDNode::equals(AbsBinaryDNode* obj) {
     try {
-        return descendants->equals(obj->descendants);
+        return descendants.equals(&(obj->descendants));
     }
     catch (exception ex) { //}(ClassCastException cce){
         return false;
@@ -163,7 +177,7 @@ bool AbsBinaryDNode::equals(AbsBinaryDNode* obj) {
 
 TreeMap* AbsBinaryDNode::getDescendantsByLevel() {
     TreeMap* levelsMap = new TreeMap();
-    buildLevels(static_pointer_cast<AbsBinaryDNode>(shared_from_this()), levelsMap, 0);
+    levelsMap = buildLevels(static_pointer_cast<AbsBinaryDNode>(shared_from_this()), levelsMap, 0);
     return levelsMap;
 }
 
@@ -180,11 +194,11 @@ std::string AbsBinaryDNode::toString() {
 //    if (softClasifier)
         data << "s" << softClasifier.toString() << "|";
     
-    if (descendants)
-        data << "d" << descendants->toString() << "|";
+//    if (descendants)
+        data << "d" << descendants.toString() << "|";
     
-    for (vector<shared_ptr<AbsBinaryDNode>>::iterator it = children.begin(); it != children.end(); it++) {
-        if (*it != NULL)
+    for (vector<shared_ptr<AbsBinaryDNode> >::iterator it = children.begin(); it != children.end(); it++) {
+        if (*it != nullptr)
             data << "c" << *it << " " << (*it)->toString() << "|";
     }
     
@@ -213,30 +227,30 @@ AbsBinaryDNode* AbsBinaryDNode::fromString(std::string data) {
 }
 
 void AbsBinaryDNode::DeleteTreeMap(TreeMap* tree) {
-    
-    // TODO: are DecompositionNodes being held in another linked list? Using AbsBinDNodes?
     for (auto const& x: *tree) {
-        LeafMap* lm = x.second;
-//        for (auto const& y: *lm) {
+//        LeafMap* lm = x.second;
+ //       for (auto const& y: *lm) {
 //            if (y.second->getType() == nodeType::StaticDecompositionNode || y.second->getType() == nodeType::BinDLeaf || y.second->getType() == nodeType::AbsBinaryDNode)
 //                delete y.second;
 //        }
-        delete x.second;
+        x.second->clear();
+//        delete x.second;
     }
     tree->clear();
     
     delete tree;
 }
 
-void AbsBinaryDNode::buildLevels(shared_ptr<AbsBinaryDNode> root, TreeMap* levelsMap, int level){
+TreeMap* AbsBinaryDNode::buildLevels(shared_ptr<AbsBinaryDNode> root, TreeMap* levelsMap, int level){
     if (root->getType() == nodeType::BinDLeaf) { //root instanceof BinDLeaf){   // this is a true leaf, it doesn't have children to follow
         if (levelsMap->find(level) == levelsMap->end()) {
-            levelsMap->insert(TreeNode(level, new LeafMap()));
+            levelsMap->insert(TreeNode(level, make_shared<LeafMap>()));
         }
-        LeafMap* lm = levelsMap->at(level);
+        shared_ptr<LeafMap> lm = levelsMap->at(level);
         lm->insert(LeafNode(root->symbol(), root));
-        return;
+    } else {
+        levelsMap = buildLevels(root->children[LEFT], levelsMap, level+1);
+        levelsMap = buildLevels(root->children[RIGHT], levelsMap, level+1);
     }
-    buildLevels(root->children[LEFT], levelsMap, level+1);
-    buildLevels(root->children[RIGHT], levelsMap, level+1);
+    return levelsMap;
 }

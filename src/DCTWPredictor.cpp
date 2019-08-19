@@ -20,7 +20,7 @@ DCTWPredictor::DCTWPredictor() : dctw(NULL), trainingContext(NULL) {
 DCTWPredictor::~DCTWPredictor() {
 //    if (dctw)
 //        delete dctw;
-    dctw = NULL;
+    dctw = nullptr;
     if (trainingContext)
         delete trainingContext;
 }
@@ -56,9 +56,14 @@ void DCTWPredictor::learn(vector<int>* trainingSequence) {
             it++;
     
     IntSampleIter ssi(trainingSequence);
+    if (dctw)
+        dctw = nullptr;
+    
     dctw = builder.buildStatic((SampleIterator*)(&ssi));
     
     //    Context* context = new DefaultContext(vmmOrder);  // now using class variable to preserve across training steps
+    if (!dctw)
+        return;
     
     for (int i=0, symbol=-1; i < trainingSequence->size(); ++i) {
         symbol = trainingSequence->at(i);
@@ -89,7 +94,7 @@ void DCTWPredictor::learn(vector<int>* trainingSequence) {
 //
 //}
 double DCTWPredictor::predict(int symbol, vector<int>* context) {
-    if (symbol >= abSize)
+    if (symbol >= abSize || !dctw)
         return -1;
     
     try {
@@ -104,7 +109,7 @@ double DCTWPredictor::predict(int symbol, vector<int>* context) {
         return ret; // does dctw keep ctwContext or do we need to free it?
     }
     catch (exception ex) { //} (NullPointerException npe) {
-        if (dctw == NULL) {
+        if (!dctw) {
             throw "VMMNotTrainedException"; // new VMMNotTrainedException();
         }
         else {
@@ -113,6 +118,9 @@ double DCTWPredictor::predict(int symbol, vector<int>* context) {
     }
 }
 double* DCTWPredictor::predictAll(vector<int>* context) {
+    if (!dctw)
+        return NULL;
+    
     double* out = new double[abSize];
     
     Context* ctwContext = new DefaultContext(vmmOrder);
@@ -134,6 +142,9 @@ double DCTWPredictor::logEval(vector<int>* testSequence) {
 
 double DCTWPredictor::logEval(vector<int>* testSequence, vector<int>* initialContext) {
     try {
+        if (!dctw)
+            return -1;
+        
         Context* context = new DefaultContext(vmmOrder);
         if (initialContext != NULL) {
             for (int i = 0; i < initialContext->size(); ++i) {
@@ -155,7 +166,7 @@ double DCTWPredictor::logEval(vector<int>* testSequence, vector<int>* initialCon
         return eval * NEGTIVE_INVERSE_LOG_2;
     }
     catch (exception ex) { //} (NullPointerException npe) {
-        if (dctw == NULL) {
+        if (!dctw) {
             throw "VMMNotTrainedException"; // new VMMNotTrainedException();
         }
         else {

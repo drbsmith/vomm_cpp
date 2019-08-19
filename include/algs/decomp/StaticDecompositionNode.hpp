@@ -32,6 +32,9 @@ namespace vmm_algs_decomp {
 
     class StaticDecompositionNode : public AbsBinaryDNode {
 public:
+        StaticDecompositionNode() {
+            myType = DecompositionNode::nodeType::StaticDecompositionNode;
+        }
         StaticDecompositionNode(int abSize, shared_ptr<AbsBinaryDNode> rightChild, shared_ptr<AbsBinaryDNode> leftChild, int softModelDepth) :
                         AbsBinaryDNode(abSize, rightChild, leftChild, softModelDepth) {
                             myType = DecompositionNode::nodeType::StaticDecompositionNode;

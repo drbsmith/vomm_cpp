@@ -32,12 +32,21 @@ namespace vmm_algs_decomp {
 
 class BinDLeaf : public AbsBinaryDNode {
 public:
-    BinDLeaf(int symbol, int absize, int softModelSize) : AbsBinaryDNode(absize, NULL, NULL, softModelSize) {
+    BinDLeaf() {
+        myType = DecompositionNode::nodeType::BinDLeaf;
+    }
+    BinDLeaf(int symbol, int absize, int softModelSize) : AbsBinaryDNode(absize, nullptr, nullptr, softModelSize) {
         myType = DecompositionNode::nodeType::BinDLeaf;
         // super(); <--- happens automatically in c++
-        descendants = new BitSet(absize);
+        Init(symbol, absize, softModelSize);
+    }
+    
+    void Init(int symbol, int absize, int softModelSize) {
+        AbsBinaryDNode::Init(absize, nullptr, nullptr, softModelSize);
+        
+        descendants.resize(absize); // = new BitSet(absize);
         mySym = symbol;
-        descendants->Set(mySym, true);  //  <-- also happens automat
+        descendants.Set(mySym, true);  //  <-- also happens automat
         if (mySym > 250)
             mySym = mySym;
     }

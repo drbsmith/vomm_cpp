@@ -33,7 +33,7 @@ namespace vmm_algs_decomp {
     
     typedef pair<const int, shared_ptr<DecompositionNode> > LeafNode;
     typedef map<LeafNode::first_type, LeafNode::second_type> LeafMap;    // leaves in our tree
-    typedef pair<const int, LeafMap*> TreeNode;
+    typedef pair<const int, shared_ptr<LeafMap> > TreeNode;
     typedef map<TreeNode::first_type, TreeNode::second_type> TreeMap;     // trunks in our tree
     
     class BitSet {
@@ -41,8 +41,11 @@ namespace vmm_algs_decomp {
         vector<bool> bits; //int *bits;
 //        unsigned int numBits;
     public:
+        BitSet();
         BitSet(unsigned int size);
         ~BitSet();
+        
+        void resize(unsigned int size);
         
         void OR(BitSet *other);
         void AND(BitSet *other);
@@ -71,7 +74,7 @@ namespace vmm_algs_decomp {
         const static int BRANCHING_FACTOR = 2;
     protected:
         DecompVolfNode softClasifier;
-        BitSet* descendants;
+        BitSet descendants;
         vector<shared_ptr<AbsBinaryDNode> > children;
         
         // mySym, used primarily by BinDLeaf
@@ -84,9 +87,12 @@ namespace vmm_algs_decomp {
 //        }
 
     public:
+        AbsBinaryDNode();
         AbsBinaryDNode(int abSize, shared_ptr<AbsBinaryDNode> rightChild, shared_ptr<AbsBinaryDNode> leftChild, int softModelDepth);
+        
         virtual ~AbsBinaryDNode();
         
+        void Init(int abSize, shared_ptr<AbsBinaryDNode> rightChild, shared_ptr<AbsBinaryDNode> leftChild, int softModelDepth);
 
         virtual double predict(int symbol, Context* context)=0; //
 
@@ -107,7 +113,7 @@ namespace vmm_algs_decomp {
         static void DeleteTreeMap(TreeMap* tree);
         
     private:
-        void buildLevels(shared_ptr<AbsBinaryDNode> root, TreeMap* levelsMap, int level);
+        TreeMap* buildLevels(shared_ptr<AbsBinaryDNode> root, TreeMap* levelsMap, int level);
 
     };  // class AbsBinaryDNode
 }   // namespace

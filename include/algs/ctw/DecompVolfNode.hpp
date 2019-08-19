@@ -17,6 +17,7 @@ GNU General Public License (<a href="http://www.gnu.org/copyleft/gpl.html">GPL</
 
 #include <vector>
 #include <string>
+#include <memory>
 
 namespace vmm_algs_ctw {
     
@@ -53,7 +54,7 @@ namespace vmm_algs_ctw {
       double alphaInversed;
       double abSizeDivAlpha;
 
-      vector<DecompVolfNode*> children;// mem consuming //
+      vector<shared_ptr<DecompVolfNode> > children;// mem consuming //
 
     public:
         DecompVolfNode();
@@ -72,15 +73,15 @@ namespace vmm_algs_ctw {
         double learn(int symbol, int symSetLabel, ContextIterator* context);
 
         string toString();
-        DecompVolfNode* fromString(string data);
-        void AddChild(DecompVolfNode* child);
+        shared_ptr<DecompVolfNode> fromString(string data);
+        void AddChild(shared_ptr<DecompVolfNode> child);
         
     private:
         double* predict(ContextIterator* context);
 
         double* learnAll(int newSymbol, int symSetLabel, ContextIterator* context);
 
-        DecompVolfNode* getChild(int sym);
+        shared_ptr<DecompVolfNode> getChild(int sym);
 
         void rescaleCounts();
 

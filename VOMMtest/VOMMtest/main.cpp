@@ -7,10 +7,10 @@
 //
 
 // defines to test each of the vomm algorithms
-//#define TEST_PST
+#define TEST_PST
 //#define TEST_BIN
 #define TEST_DCTW
-//#define TEST_PPMC
+#define TEST_PPMC
 //#define TEST_LZMS
 
 #define TEST_SERIALIZATION
@@ -66,7 +66,7 @@ int main(int argc, const char * argv[]) {
     }
 #else
     int data[] = {97, 98, 114, 97, 99, 97, 100, 97, 98, 114, 97}; // same as seq = "abracadabra"
-    string test = "abracadabra"; // "The quick brown fox jumped over the lazy dog.";
+    string test = "The quick brown fox jumped over the lazy dog."; //"abracadabra"; 
     for (int i = 0; i < test.size(); i++)
         dataVec.push_back(test[i]);
 #endif
@@ -176,8 +176,10 @@ int main(int argc, const char * argv[]) {
             delete prob;
         prob = dctw->predictAll("abrac");
     }
-    cout << "P(all) : " << prob[99] << endl << endl;
-    delete prob; prob = NULL;
+    if (prob) {
+        cout << "P(all) : " << prob[99] << endl << endl;
+        delete prob; prob = NULL;
+    }
     
     delete dctw;
 //    cout << dctw->ModelToString() << endl; // this is not finished, for serializing and deserializing. It's a complex tree with lots of nodes!

@@ -31,6 +31,9 @@ namespace vmm_algs_decomp {
 
     class DynamicBinDNode : public AbsBinaryDNode {
     public:
+        DynamicBinDNode() {
+            myType = nodeType::DynamicBinDNode;
+        }
         DynamicBinDNode(int abSize, shared_ptr<AbsBinaryDNode> rightChild,  shared_ptr<AbsBinaryDNode> leftChild, int softModelDepth) : AbsBinaryDNode(abSize, rightChild, leftChild, softModelDepth) {
             myType = nodeType::DynamicBinDNode;
         }
