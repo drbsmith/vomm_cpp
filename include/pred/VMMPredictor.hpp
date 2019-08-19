@@ -37,7 +37,7 @@ public:
    */
     virtual void learn(std::string trainingSequence) {
         std::vector<int> seq;
-        for (int i = 0; i < trainingSequence.size(); i++) {
+		for (size_t i = 0; i < trainingSequence.size(); i++) {
             seq.push_back((int)trainingSequence.at(i));
         }
         learn(&seq);
@@ -54,7 +54,7 @@ public:
    */
     double predict(int symbol, std::string context) {
         std::vector<int> seq;
-        for (int i = 0; i < context.size(); i++) {
+        for (size_t i = 0; i < context.size(); i++) {
             seq.push_back((int)context.at(i));
         }
         return predict(symbol, &seq);
@@ -72,7 +72,7 @@ public:
    */
     double logEval(std::string testSequence) {
         std::vector<int> seq;
-        for (int i = 0; i < testSequence.size(); i++) {
+        for (size_t i = 0; i < testSequence.size(); i++) {
             seq.push_back((int)testSequence.at(i));
         }
         return logEval(&seq);
@@ -92,10 +92,10 @@ public:
     double logEval(std::string testSequence, std::string initialContext) {
         
         std::vector<int> tseq, icon;
-        for (int i = 0; i < testSequence.size(); i++) {
+        for (size_t i = 0; i < testSequence.size(); i++) {
             tseq.push_back((int)testSequence.at(i));
         }
-        for (int i = 0; i < initialContext.size(); i++) {
+        for (size_t i = 0; i < initialContext.size(); i++) {
             icon.push_back((int)initialContext.at(i));
         }
         return logEval(&tseq, &icon);
@@ -104,7 +104,7 @@ public:
 
     double* predictAll(std::string context) {
         std::vector<int> seq;
-        for (int i = 0; i < context.size(); i++) {
+        for (size_t i = 0; i < context.size(); i++) {
             seq.push_back((int)context.at(i));
         }
         return predictAll(&seq);

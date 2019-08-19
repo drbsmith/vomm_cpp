@@ -84,7 +84,7 @@ class SampleIterator2SamplesBridge : public Samples {
       }
 
 
-      virtual unsigned long size(int sampleIndex = 0) override {
+      virtual size_t size(int sampleIndex = 0) override {
           if (sampleIndex == 0) {
               return symList.size();
           } else
@@ -92,12 +92,12 @@ class SampleIterator2SamplesBridge : public Samples {
      }
 
 
-      virtual unsigned long size() override {
+      virtual size_t size() override {
           /*Only one sample*/
           return 1;
       }
 
-      virtual unsigned long allLength() override {
+      virtual size_t allLength() override {
           return symList.size();
       }
 

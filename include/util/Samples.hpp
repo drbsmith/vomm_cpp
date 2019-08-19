@@ -115,8 +115,8 @@ public:
         return ret;
     }
 
-    virtual unsigned long size(int sampleIndex) {
-      unsigned long ret = 0;
+    virtual size_t size(int sampleIndex) {
+		size_t ret = 0;
 
       if (sampleIndex >= 0 && sampleIndex < samples.size())
           ret = samples.at(sampleIndex).size();
@@ -124,12 +124,12 @@ public:
       return ret;
     }
 
-    virtual unsigned long size() {
+    virtual size_t size() {
         return samples.size();
     }
 
-    virtual unsigned long allLength() {
-      unsigned long ret = 0;
+    virtual size_t allLength() {
+		size_t ret = 0;
       for(int i=0; i<samples.size(); ++i){
           ret += samples[i].size();
       }

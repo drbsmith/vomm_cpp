@@ -82,7 +82,7 @@ double PSTPredictor::predict(int symbol, vector<int>* context) {
 //        pstPredictor = new PSTArithPredictor(pst);
 //        PSTArithPredictor pstPredictor(pst);  <-- now retained at the class level
         
-        for (int i = 0, sym = -1; i < context->size(); ++i) {
+        for (size_t i = 0, sym = -1; i < context->size(); ++i) {
             sym = (int) context->at(i);
             if (sym < abSize) {
                 pArr = pstPredictor->predict();

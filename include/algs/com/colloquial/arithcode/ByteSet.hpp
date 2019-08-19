@@ -63,7 +63,7 @@ public:
    * @since 1.1
    */
   /*@ron changed i to sym*/
-  void add(int sym) {
+  void add(size_t sym) {
       while (sym >= bitSet.size())
           bitSet.push_back(false);
       

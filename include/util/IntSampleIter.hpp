@@ -72,7 +72,7 @@ namespace vmm_util {
         }
 
 
-        long size() {
+        size_t size() {
             return data.size();
         }
 

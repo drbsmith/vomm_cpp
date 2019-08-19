@@ -63,7 +63,7 @@ public:
    * Number of symbols to iterate
    * @return num of symbols to iterate
    */
-        virtual long size()=0;
+        virtual size_t size()=0;
 
 
 };

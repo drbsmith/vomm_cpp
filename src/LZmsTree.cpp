@@ -48,7 +48,7 @@ void LZmsTree::learnOffsetSequence(vector<int>* sequence, int offset) {
             child = new LZNode(currentNode, sequence->at(i), true);
         else {
             // have to add on the rest of the window + a single character
-            int length = fmin(minContext - currentNode->getDepth() + 1, sequence->size() - i);
+            int length = (int)fmin(minContext - currentNode->getDepth() + 1, sequence->size() - i);
             child = LZNode::createBranch(currentNode, sequence, i, length);
             i += length;
         }
